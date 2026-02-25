@@ -11,6 +11,8 @@
 - Add streaming ingestion pipeline
 - Support near-real-time cost aggregation
 - Introduce tenant, feature, and endpoint-level breakdowns
+- Add self-serve onboarding: signup/login, project CRUD, API key provisioning
+- Add first-event onboarding wizard with SDK setup snippets and live verification
 
 ## Phase 3: Budget Alerts & Anomaly Detection
 
