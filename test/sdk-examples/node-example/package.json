@@ -1,0 +1,12 @@
+{
+  "name": "tokvera-node-sdk-example",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "example": "node index.mjs"
+  },
+  "dependencies": {
+    "@tokvera/sdk": "latest"
+  }
+}
