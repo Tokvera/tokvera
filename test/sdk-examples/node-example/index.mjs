@@ -32,10 +32,13 @@ const fakeOpenAI = {
 };
 
 async function main() {
+  const feature = process.env.TOKVERA_FEATURE || "sdk_smoke_node";
+  const waitMs = Number(process.env.TOKVERA_WAIT_MS || 1200);
+
   const tracked = trackOpenAI(fakeOpenAI, {
     api_key: process.env.TOKVERA_API_KEY,
     ingest_url: process.env.TOKVERA_INGEST_URL,
-    feature: "sdk_smoke_node",
+    feature,
     tenant_id: "example_tenant",
     customer_id: "example_customer",
     environment: "test",
@@ -52,8 +55,8 @@ async function main() {
   });
 
   // SDK sends ingestion in fire-and-forget mode.
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  console.log("node example complete");
+  await new Promise((resolve) => setTimeout(resolve, waitMs));
+  console.log(`node example complete (feature=${feature}, ingest=${process.env.TOKVERA_INGEST_URL})`);
 }
 
 main().catch((error) => {
