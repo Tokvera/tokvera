@@ -20,8 +20,17 @@ Tokvera exists to make those answers observable by default.
 
 ## SDKs
 
-- JavaScript SDK (placeholder)
-- Python SDK (placeholder)
+- JavaScript SDK: [`@tokvera/sdk` on npm](https://www.npmjs.com/package/@tokvera/sdk)
+- Python SDK: [`tokvera` on PyPI](https://pypi.org/project/tokvera/)
+
+## Examples
+
+Public runnable examples are available in [`examples/`](examples/README.md):
+
+- Node SDK example: [`examples/node`](examples/node)
+- Python SDK example: [`examples/python`](examples/python)
+
+Both examples include Trace Context v1 fields (`trace_id`, `conversation_id`, `span_id`, `parent_span_id`, `step_name`).
 
 ## Privacy-First Approach
 
