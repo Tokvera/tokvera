@@ -8,6 +8,6 @@
     "example:integrations": "node integrations.mjs"
   },
   "dependencies": {
-    "@tokvera/sdk": "^0.2.2"
+    "@tokvera/sdk": "^0.2.3"
   }
 }
