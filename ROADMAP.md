@@ -13,6 +13,14 @@
 - Introduce tenant, feature, and endpoint-level breakdowns
 - Add self-serve onboarding: signup/login, project CRUD, API key provisioning
 - Add first-event onboarding wizard with SDK setup snippets and live verification
+- Add baseline trace context support (`trace_id`, `span_id`, `parent_span_id`)
+
+## Phase 2.5: Tracing Beta
+
+- Add run/span schema on shared event foundation
+- Add trace list + trace detail explorer in dashboard
+- Attribute latency/error/cost to each span step
+- Add trace quality indicators (slow spans, failures, retry loops)
 
 ## Phase 3: Budget Alerts & Anomaly Detection
 
