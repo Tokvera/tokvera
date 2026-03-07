@@ -88,6 +88,9 @@ def main() -> None:
         conversation_id=conversation_id,
         span_id=root_span_id,
         step_name="classify_intent",
+        outcome="success",
+        quality_label="good",
+        feedback_score=5,
     )
 
     classify_client.responses.create(
@@ -108,6 +111,11 @@ def main() -> None:
         span_id=draft_span_id,
         parent_span_id=root_span_id,
         step_name="draft_reply",
+        outcome="success",
+        retry_reason="none",
+        fallback_reason="none",
+        quality_label="good",
+        feedback_score=5,
     )
 
     draft_client.chat.completions.create(
@@ -125,10 +133,14 @@ def main() -> None:
             "root_span_id": root_span_id,
             "draft_span_id": draft_span_id,
             "ingest_url": ingest_url,
+            "evaluation_signals": {
+                "outcome": "success",
+                "quality_label": "good",
+                "feedback_score": 5,
+            },
         }
     )
 
 
 if __name__ == "__main__":
     main()
-

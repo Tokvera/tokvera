@@ -5,7 +5,7 @@ This folder contains simple, runnable examples for both published SDKs:
 - JavaScript SDK (`@tokvera/sdk`)
 - Python SDK (`tokvera`)
 
-Each example uses a fake OpenAI-shaped client so you can validate Tokvera event emission without provider credentials.
+Each example uses fake provider-shaped clients/callback payloads so you can validate Tokvera event emission without provider credentials.
 
 ## Prerequisites
 
@@ -27,6 +27,19 @@ npm install
 npm run example
 ```
 
+### Node Integrations Example
+
+```bash
+cd examples/node
+npm install
+npm run example:integrations
+```
+
+This runs:
+- Express middleware context propagation
+- LangChain callback helper
+- Vercel AI SDK `generateText` wrapper
+
 ## Python Example
 
 ```bash
@@ -35,9 +48,22 @@ pip install -r requirements.txt
 python example.py
 ```
 
-## Trace Context
+### Python Integrations Example
 
-Both examples emit Trace Context v1 tags:
+```bash
+cd examples/python
+pip install -r requirements.txt
+python integrations.py
+```
+
+This runs:
+- FastAPI middleware context propagation
+- LangChain callback helper
+- LlamaIndex callback helper
+
+## Telemetry Coverage
+
+All examples emit Trace Context v1 tags:
 
 - `trace_id`
 - `conversation_id`
@@ -45,3 +71,10 @@ Both examples emit Trace Context v1 tags:
 - `parent_span_id`
 - `step_name`
 
+The updated examples also emit Evaluation Signals v1:
+
+- `outcome`
+- `retry_reason`
+- `fallback_reason`
+- `quality_label`
+- `feedback_score`

@@ -60,6 +60,9 @@ async function main() {
     conversation_id: conversationId,
     span_id: rootSpanId,
     step_name: "classify_intent",
+    outcome: "success",
+    quality_label: "good",
+    feedback_score: 5,
   });
 
   await classifyClient.responses.create({
@@ -80,6 +83,11 @@ async function main() {
     span_id: draftSpanId,
     parent_span_id: rootSpanId,
     step_name: "draft_reply",
+    outcome: "success",
+    retry_reason: "none",
+    fallback_reason: "none",
+    quality_label: "good",
+    feedback_score: 5,
   });
 
   await draftClient.chat.completions.create({
@@ -89,11 +97,22 @@ async function main() {
 
   await new Promise((resolve) => setTimeout(resolve, waitMs));
   console.log("node example complete");
-  console.log({ feature, traceId, conversationId, rootSpanId, draftSpanId, ingestUrl });
+  console.log({
+    feature,
+    traceId,
+    conversationId,
+    rootSpanId,
+    draftSpanId,
+    ingestUrl,
+    evaluationSignals: {
+      outcome: "success",
+      quality_label: "good",
+      feedback_score: 5,
+    },
+  });
 }
 
 main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-

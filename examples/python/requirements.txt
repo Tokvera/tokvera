@@ -1,2 +1,1 @@
-tokvera==0.2.1
-
+tokvera==0.2.2

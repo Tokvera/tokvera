@@ -31,6 +31,7 @@ Public runnable examples are available in [`examples/`](examples/README.md):
 - Python SDK example: [`examples/python`](examples/python)
 
 Both examples include Trace Context v1 fields (`trace_id`, `conversation_id`, `span_id`, `parent_span_id`, `step_name`).
+The examples also include Evaluation Signals v1 and integration demos for middleware/callback helpers.
 
 ## Privacy-First Approach
 

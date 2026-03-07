@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "example": "node index.mjs"
+    "example": "node index.mjs",
+    "example:integrations": "node integrations.mjs"
   },
   "dependencies": {
-    "@tokvera/sdk": "^0.2.1"
+    "@tokvera/sdk": "^0.2.2"
   }
 }
-
