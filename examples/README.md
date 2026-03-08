@@ -21,6 +21,15 @@ TOKVERA_INGEST_URL=https://api.tokvera.org/v1/events
 
 ## Node Example
 
+Create local env file first:
+
+```bash
+cd examples/node
+cp .env.example .env
+```
+
+Then run:
+
 ```bash
 cd examples/node
 npm install
@@ -41,6 +50,15 @@ This runs:
 - Vercel AI SDK `generateText` wrapper
 
 ## Python Example
+
+Create local env file first:
+
+```bash
+cd examples/python
+cp .env.example .env
+```
+
+Then run:
 
 ```bash
 cd examples/python

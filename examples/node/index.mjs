@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { trackOpenAI } from "@tokvera/sdk";
+import { loadLocalEnv } from "./env.mjs";
 
 const fakeOpenAI = {
   chat: {
@@ -37,6 +38,8 @@ function nextId(prefix) {
 }
 
 async function main() {
+  loadLocalEnv();
+
   const apiKey = process.env.TOKVERA_API_KEY;
   const ingestUrl = process.env.TOKVERA_INGEST_URL;
   const feature = process.env.TOKVERA_FEATURE || "sdk_example_node";

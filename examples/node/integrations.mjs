@@ -6,6 +6,7 @@ import {
   trackOpenAI,
   wrapVercelAIGenerateText,
 } from "@tokvera/sdk";
+import { loadLocalEnv } from "./env.mjs";
 
 const fakeOpenAI = {
   chat: {
@@ -162,6 +163,8 @@ async function runVercelAIHelperExample({ apiKey, ingestUrl, feature }) {
 }
 
 async function main() {
+  loadLocalEnv();
+
   const apiKey = process.env.TOKVERA_API_KEY;
   const ingestUrl = process.env.TOKVERA_INGEST_URL;
   const feature = process.env.TOKVERA_FEATURE || "sdk_integrations_node";
