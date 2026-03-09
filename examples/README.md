@@ -89,6 +89,14 @@ All examples emit Trace Context v1 tags:
 - `parent_span_id`
 - `step_name`
 
+Examples also emit Trace Context v2 fields:
+
+- `schema_version=2026-04-01`
+- `span_kind`
+- `metrics` (step-level token/cost/latency metadata)
+- `decision` (routing/retry outcome markers)
+- `payload_blocks` (redacted/encrypted server-side when raw capture is enabled)
+
 The updated examples also emit Evaluation Signals v1:
 
 - `outcome`
@@ -96,3 +104,6 @@ The updated examples also emit Evaluation Signals v1:
 - `fallback_reason`
 - `quality_label`
 - `feedback_score`
+
+Python compatibility:
+- Python example filters track kwargs against the installed SDK signature, so it remains runnable on slightly older PyPI builds while still demonstrating v2 fields when available.

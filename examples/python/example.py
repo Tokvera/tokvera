@@ -1,3 +1,4 @@
+import inspect
 import os
 import time
 import uuid
@@ -60,6 +61,12 @@ def next_id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex}"
 
 
+def track_openai_compat(client, **kwargs):
+    supported = set(inspect.signature(track_openai).parameters.keys())
+    filtered = {key: value for key, value in kwargs.items() if key in supported}
+    return track_openai(client, **filtered)
+
+
 def main() -> None:
     load_local_env()
 
@@ -74,20 +81,37 @@ def main() -> None:
         raise RuntimeError("TOKVERA_INGEST_URL is required")
 
     trace_id = next_id("trc")
+    run_id = next_id("run")
     conversation_id = next_id("conv")
     root_span_id = next_id("spn")
 
-    classify_client = track_openai(
+    classify_client = track_openai_compat(
         FakeOpenAI(),
         api_key=api_key,
         feature=feature,
         tenant_id="example_tenant",
         customer_id="example_customer",
         environment="example",
+        schema_version="2026-04-01",
         trace_id=trace_id,
+        run_id=run_id,
         conversation_id=conversation_id,
         span_id=root_span_id,
         step_name="classify_intent",
+        span_kind="orchestrator",
+        capture_content=True,
+        payload_blocks=[
+            {
+                "payload_type": "context",
+                "content": "Support policy context: classify ticket type before drafting response.",
+            }
+        ],
+        metrics={"cost_usd": 0.00007},
+        decision={
+            "outcome": "success",
+            "route": "openai:gpt-4o-mini",
+            "routing_reason": "default_policy",
+        },
         outcome="success",
         quality_label="good",
         feedback_score=5,
@@ -99,18 +123,30 @@ def main() -> None:
     )
 
     draft_span_id = next_id("spn")
-    draft_client = track_openai(
+    draft_client = track_openai_compat(
         FakeOpenAI(),
         api_key=api_key,
         feature=feature,
         tenant_id="example_tenant",
         customer_id="example_customer",
         environment="example",
+        schema_version="2026-04-01",
         trace_id=trace_id,
+        run_id=run_id,
         conversation_id=conversation_id,
         span_id=draft_span_id,
         parent_span_id=root_span_id,
         step_name="draft_reply",
+        span_kind="model",
+        capture_content=True,
+        payload_blocks=[
+            {
+                "payload_type": "context",
+                "content": "Customer profile: pro tier, account verified, issue severity medium.",
+            }
+        ],
+        metrics={"cost_usd": 0.00012},
+        decision={"outcome": "success", "retry_reason": "none"},
         outcome="success",
         retry_reason="none",
         fallback_reason="none",
@@ -129,6 +165,7 @@ def main() -> None:
         {
             "feature": feature,
             "trace_id": trace_id,
+            "run_id": run_id,
             "conversation_id": conversation_id,
             "root_span_id": root_span_id,
             "draft_span_id": draft_span_id,

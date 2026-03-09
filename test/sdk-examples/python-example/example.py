@@ -1,5 +1,7 @@
+import inspect
 import os
 import time
+import uuid
 from pathlib import Path
 
 from tokvera import track_openai
@@ -57,6 +59,16 @@ def load_local_env() -> None:
         os.environ.setdefault(key, value)
 
 
+def next_id(prefix: str) -> str:
+    return f"{prefix}_{uuid.uuid4().hex}"
+
+
+def track_openai_compat(client, **kwargs):
+    supported = set(inspect.signature(track_openai).parameters.keys())
+    filtered = {key: value for key, value in kwargs.items() if key in supported}
+    return track_openai(client, **filtered)
+
+
 def main() -> None:
     load_local_env()
 
@@ -64,33 +76,91 @@ def main() -> None:
     ingest_url = os.getenv("TOKVERA_INGEST_URL")
     feature = os.getenv("TOKVERA_FEATURE", "sdk_smoke_python")
     wait_seconds = float(os.getenv("TOKVERA_WAIT_SECONDS", "4.0"))
+    trace_id = next_id("trc")
+    run_id = next_id("run")
+    conversation_id = next_id("conv")
+    root_span_id = next_id("spn")
+    reply_span_id = next_id("spn")
 
     if not api_key:
         raise RuntimeError("TOKVERA_API_KEY is required")
     if not ingest_url:
         raise RuntimeError("TOKVERA_INGEST_URL is required")
 
-    client = track_openai(
+    planner_client = track_openai_compat(
         FakeOpenAI(),
         api_key=api_key,
         feature=feature,
         tenant_id="example_tenant",
         customer_id="example_customer",
         environment="test",
+        schema_version="2026-04-01",
+        trace_id=trace_id,
+        run_id=run_id,
+        conversation_id=conversation_id,
+        span_id=root_span_id,
+        step_name="plan_response",
+        span_kind="orchestrator",
+        capture_content=True,
+        payload_blocks=[
+            {
+                "payload_type": "context",
+                "content": "Policy snapshot: refund for invoice mismatch allowed within 7 days after verification.",
+            }
+        ],
+        metrics={"cost_usd": 0.00008},
+        decision={
+            "outcome": "success",
+            "routing_reason": "default_policy",
+            "route": "openai:gpt-4o-mini",
+        },
+        outcome="success",
+        quality_label="good",
+        feedback_score=4.6,
     )
 
-    client.chat.completions.create(
+    planner_client.responses.create(
         model="gpt-4o-mini",
-        messages=[{"role": "user", "content": "hello from python"}],
+        input="Plan a support answer for an invoice mismatch request. Keep response short and safe.",
     )
-    client.responses.create(
+
+    reply_client = track_openai_compat(
+        FakeOpenAI(),
+        api_key=api_key,
+        feature=feature,
+        tenant_id="example_tenant",
+        customer_id="example_customer",
+        environment="test",
+        schema_version="2026-04-01",
+        trace_id=trace_id,
+        run_id=run_id,
+        conversation_id=conversation_id,
+        span_id=reply_span_id,
+        parent_span_id=root_span_id,
+        step_name="draft_response",
+        span_kind="model",
+        capture_content=True,
+        payload_blocks=[
+            {
+                "payload_type": "context",
+                "content": "Customer tier: pro. Account state: verified. Ticket priority: normal.",
+            }
+        ],
+        metrics={"cost_usd": 0.00011},
+        decision={"outcome": "success", "retry_reason": "none"},
+        outcome="success",
+        quality_label="good",
+        feedback_score=4.8,
+    )
+
+    reply_client.chat.completions.create(
         model="gpt-4o-mini",
-        input="hello from python responses",
+        messages=[{"role": "user", "content": "hello from python trace v2 example"}],
     )
 
     # Python SDK ingestion runs on daemon thread. Wait before process exit.
     time.sleep(wait_seconds)
-    print(f"python example complete (feature={feature}, ingest={ingest_url})")
+    print(f"python example complete (feature={feature}, ingest={ingest_url}, trace_id={trace_id})")
 
 
 if __name__ == "__main__":

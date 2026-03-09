@@ -49,6 +49,7 @@ async function main() {
   if (!ingestUrl) throw new Error("TOKVERA_INGEST_URL is required");
 
   const traceId = nextId("trc");
+  const runId = nextId("run");
   const conversationId = nextId("conv");
   const rootSpanId = nextId("spn");
 
@@ -59,10 +60,28 @@ async function main() {
     tenant_id: "example_tenant",
     customer_id: "example_customer",
     environment: "example",
+    schema_version: "2026-04-01",
     trace_id: traceId,
+    run_id: runId,
     conversation_id: conversationId,
     span_id: rootSpanId,
     step_name: "classify_intent",
+    span_kind: "orchestrator",
+    capture_content: true,
+    payload_blocks: [
+      {
+        payload_type: "context",
+        content: "Support policy context: classify ticket type before drafting response.",
+      },
+    ],
+    metrics: {
+      cost_usd: 0.00007,
+    },
+    decision: {
+      outcome: "success",
+      route: "openai:gpt-4o-mini",
+      routing_reason: "default_policy",
+    },
     outcome: "success",
     quality_label: "good",
     feedback_score: 5,
@@ -81,11 +100,28 @@ async function main() {
     tenant_id: "example_tenant",
     customer_id: "example_customer",
     environment: "example",
+    schema_version: "2026-04-01",
     trace_id: traceId,
+    run_id: runId,
     conversation_id: conversationId,
     span_id: draftSpanId,
     parent_span_id: rootSpanId,
     step_name: "draft_reply",
+    span_kind: "model",
+    capture_content: true,
+    payload_blocks: [
+      {
+        payload_type: "context",
+        content: "Customer profile: pro tier, account verified, issue severity medium.",
+      },
+    ],
+    metrics: {
+      cost_usd: 0.00012,
+    },
+    decision: {
+      outcome: "success",
+      retry_reason: "none",
+    },
     outcome: "success",
     retry_reason: "none",
     fallback_reason: "none",
@@ -103,6 +139,7 @@ async function main() {
   console.log({
     feature,
     traceId,
+    runId,
     conversationId,
     rootSpanId,
     draftSpanId,

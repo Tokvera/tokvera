@@ -30,7 +30,12 @@ Expected result:
 
 - Node example sends `chat.completions.create` and `responses.create` events.
 - Python example sends `chat.completions.create` and `responses.create` events.
+- Both examples emit Trace Context v2 (`schema_version=2026-04-01`) with `trace_id`, `run_id`, `span_id`, `parent_span_id`, `step_name`.
+- Both examples include v2 diagnostics fields: `span_kind`, `metrics`, `decision`, and `payload_blocks`.
 - Final output confirms at least 4 total ingested events.
+
+Python example notes:
+- Uses a compatibility wrapper so smoke still runs with older published `tokvera` versions that do not yet accept every v2 keyword argument.
 
 ## Run Production Smoke
 
@@ -59,6 +64,7 @@ Expected result:
 - `GET /health` returns success.
 - Node and Python examples each emit 2 events to `/v1/events`.
 - `/v1/metrics/breakdown?group_by=feature` shows both generated smoke features incrementing.
+- `/v1/traces` and `/v1/traces/:traceId` can be used to inspect emitted trace chains.
 
 ## Run First Paying-User Flow Smoke
 
