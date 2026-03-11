@@ -69,7 +69,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Phase B (M4.5 + M4.6) - Jun 1 to Jun 30, 2026
 
 ### Trace Debugging Closure
-- [ ] Deep-link from Action Center/Anomalies to exact trace + span context
+- [x] Deep-link from Action Center/Anomalies to exact trace + span context
 - [ ] Trace detail shows per-span and per-tool cost consistently
 - [ ] Retry/fallback reason and decision chain fully visible
 
