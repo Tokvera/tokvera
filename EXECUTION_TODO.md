@@ -43,6 +43,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### Billing Reliability
 - [x] Webhook idempotency by Paddle `event_id`
 - [x] Webhook health endpoint
+- [x] Expose unresolved failed webhook totals in billing health + readiness checks
 - [x] Webhook failure lifecycle alert emails
 - [x] Add stale-processing alerting runbook execution checklist
 
