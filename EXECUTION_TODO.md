@@ -71,7 +71,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### Trace Debugging Closure
 - [x] Deep-link from Action Center/Anomalies to exact trace + span context
 - [ ] Trace detail shows per-span and per-tool cost consistently
-- [ ] Retry/fallback reason and decision chain fully visible
+- [x] Retry/fallback reason and decision chain fully visible
 
 ### Eval Signals v1
 - [ ] Normalize feedback/outcome/quality signals end-to-end
