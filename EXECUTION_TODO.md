@@ -4,6 +4,15 @@ Last updated: 2026-03-11
 Owner: product + engineering
 Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
+## Documentation Discipline (Mandatory)
+
+- For every completed TODO item that changes behavior, update documentation in the same delivery cycle.
+- Documentation scope must match the change:
+  - Dashboard/public UX change -> update `tokvera-dashboard` `/docs` pages (user-facing guide + API usage references where needed).
+  - API contract/ops change -> update `tokvera-api/docs` (runbook, endpoint contracts, operational guides).
+  - SDK contract/integration change -> update `tokvera-js`/`tokvera-python` README + examples (and `tokvera/test/sdk-examples` when relevant).
+- “Done” means code + tests + docs together. No checklist item is complete with stale docs.
+
 ## Milestone Targets
 
 - [ ] M4 First paying user by 2026-05-31
@@ -102,7 +111,9 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Unit/integration tests added
 - [ ] Dashboard type + API client updated
 - [ ] Smoke scripts updated
-- [ ] Docs/runbook updated
+- [ ] Public `/docs` pages updated for all user-facing behavior changes
+- [ ] API docs/runbook updated for backend contract/ops changes
+- [ ] SDK README/examples updated for SDK contract/integration changes
 - [ ] Deployment env variables reviewed
 - [ ] Rollback plan documented
 
