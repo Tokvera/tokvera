@@ -53,6 +53,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add weekly manual replay drill for webhook failure recovery
 - [x] Add weekly automated M4 readiness workflow (billing health + sync consistency)
 - [x] Add daily 7-day operating-window evidence report workflow (artifact + optional strict gate)
+- [x] Operating-window report now gates webhook lifecycle health via `billing/health` (no admin token dependency)
 
 ### Dashboard
 - [x] Billing page consumes summary/metering/invoice/retention
