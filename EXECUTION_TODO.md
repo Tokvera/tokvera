@@ -28,7 +28,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### API and Enforcement
 - [x] Add `GET /v1/billing/entitlements`
 - [x] Add `GET /v1/billing/health`
-- [ ] Complete 402 blocked-state contract audit on all ingest/mutation paths
+- [x] Complete 402 blocked-state contract audit on all ingest/mutation paths
 - [ ] Ensure hard-cap/retention/raw-capture limits are enforced server-side on all paths
 
 ### Billing Reliability
