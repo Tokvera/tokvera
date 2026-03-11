@@ -35,12 +35,12 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Webhook idempotency by Paddle `event_id`
 - [x] Webhook health endpoint
 - [x] Webhook failure lifecycle alert emails
-- [ ] Add stale-processing alerting runbook execution checklist
+- [x] Add stale-processing alerting runbook execution checklist
 
 ### Smoke and Ops
 - [x] Post-deploy smoke script validates checkout + ingest + traces + billing
 - [x] Smoke extended to validate `billing/entitlements` and `billing/health`
-- [ ] Add weekly manual replay drill for webhook failure recovery
+- [x] Add weekly manual replay drill for webhook failure recovery
 
 ### Dashboard
 - [x] Billing page consumes summary/metering/invoice/retention
