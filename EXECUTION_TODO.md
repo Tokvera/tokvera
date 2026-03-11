@@ -11,7 +11,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
   - Dashboard/public UX change -> update `tokvera-dashboard` `/docs` pages (user-facing guide + API usage references where needed).
   - API contract/ops change -> update `tokvera-api/docs` (runbook, endpoint contracts, operational guides).
   - SDK contract/integration change -> update `tokvera-js`/`tokvera-python` README + examples (and `tokvera/test/sdk-examples` when relevant).
-- “Done” means code + tests + docs together. No checklist item is complete with stale docs.
+- "Done" means code + tests + docs together. No checklist item is complete with stale docs.
 
 ## Milestone Targets
 
@@ -38,7 +38,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add `GET /v1/billing/entitlements`
 - [x] Add `GET /v1/billing/health`
 - [x] Complete 402 blocked-state contract audit on all ingest/mutation paths
-- [ ] Ensure hard-cap/retention/raw-capture limits are enforced server-side on all paths
+- [x] Ensure hard-cap/retention/raw-capture limits are enforced server-side on all paths
 
 ### Billing Reliability
 - [x] Webhook idempotency by Paddle `event_id`
