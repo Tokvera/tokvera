@@ -61,7 +61,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### Exit Criteria for M4
 - [ ] One tenant active on paid plan for full 7-day operating window
 - [ ] Webhook lifecycle state stays healthy (no unresolved failed events)
-- [ ] Usage and limits stay in sync between API and dashboard
+- [x] Usage and limits stay in sync between API and dashboard
 
 ## Phase B (M4.5 + M4.6) - Jun 1 to Jun 30, 2026
 
