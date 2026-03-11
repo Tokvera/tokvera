@@ -50,6 +50,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Post-deploy smoke script validates checkout + ingest + traces + billing
 - [x] Smoke extended to validate `billing/entitlements` and `billing/health`
 - [x] Add weekly manual replay drill for webhook failure recovery
+- [x] Add weekly automated M4 readiness workflow (billing health + sync consistency)
 
 ### Dashboard
 - [x] Billing page consumes summary/metering/invoice/retention
