@@ -45,7 +45,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### Dashboard
 - [x] Billing page consumes summary/metering/invoice/retention
 - [x] Billing page shows entitlements + billing health panels
-- [ ] Add explicit blocked-state UX (`402` contract mapping for user-friendly CTAs)
+- [x] Add explicit blocked-state UX (`402` contract mapping for user-friendly CTAs)
 
 ### Exit Criteria for M4
 - [ ] One tenant active on paid plan for full 7-day operating window
@@ -113,4 +113,3 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - `tokvera-js` and `tokvera-python`: telemetry compatibility + gateway mode support
 - `tokvera-analytics-engine`: aggregation/detectors/savings scoring
 - `tokvera-gateway`: phase C proxy + routing control plane
-
