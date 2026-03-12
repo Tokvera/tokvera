@@ -79,6 +79,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add API contract tests for eval signal fields
 
 ### Exit Criteria
+- [x] Add automated trace workflow smoke gate (alert -> trace -> detail timing)
+- [x] Add automated parity checks for trace-reasons and evaluation signal consistency
 - [ ] Alert -> root cause -> trace evidence workflow under 5 minutes
 - [ ] No sampled/partial mismatch for trace reason and quality metrics
 
