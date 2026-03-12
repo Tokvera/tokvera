@@ -1,6 +1,6 @@
 # Tokvera Execution TODO (Mar 11, 2026 -> Mar 31, 2027)
 
-Last updated: 2026-03-11
+Last updated: 2026-03-12
 Owner: product + engineering
 Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
@@ -16,9 +16,10 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Milestone Targets
 
 - [ ] M4 First paying user by 2026-05-31
+- [ ] M4.4 Integration Platform v1 (12 official integrations) by 2026-08-31
 - [ ] M4.5 Tracing beta completion by 2026-06-30
 - [ ] M4.6 Evaluation signals v1 by 2026-06-30
-- [ ] M5 Gateway alpha by 2026-09-30
+- [ ] M5 Gateway alpha by 2026-10-31
 - [ ] M6 Savings demo by 2026-12-15
 - [ ] M7 10 active SaaS users by 2027-03-31
 - [ ] M8 $10k MRR by 2027-03-31
@@ -84,7 +85,43 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Alert -> root cause -> trace evidence workflow under 5 minutes
 - [x] No sampled/partial mismatch for trace reason and quality metrics
 
-## Phase C (Gateway Alpha / M5) - Jul 1 to Sep 30, 2026
+## Phase B.5 (Integration Expansion / M4.4) - Jul 1 to Aug 31, 2026
+
+### Official Integration Catalog (12 surfaces)
+- [x] Express middleware
+- [x] Next.js route handler + server action helper
+- [x] NestJS interceptor/middleware
+- [x] FastAPI middleware
+- [x] Django middleware
+- [x] Celery task instrumentation
+- [x] BullMQ worker instrumentation
+- [x] LangChain integration (JS + Python)
+- [x] LlamaIndex integration (Python)
+- [x] Vercel AI SDK helper
+- [x] OpenTelemetry export integration
+- [x] Outbound webhook integration
+
+### API and Connector Surfaces
+- [x] Add `GET /v1/projects/:projectId/integrations`
+- [x] Add `GET/POST/PATCH/DELETE /v1/projects/:projectId/integrations/webhooks`
+- [x] Add `GET/PATCH /v1/projects/:projectId/integrations/otel`
+- [x] Add `GET /v1/projects/:projectId/integrations/health`
+- [x] Enforce connector entitlements in API (paid plans only)
+- [x] Add retries/backoff + dead-letter/error visibility state for connectors
+
+### Integration Quality Gate (required for "official")
+- [x] Docs page published and linked under `/docs/integrations`
+- [x] Runnable example available
+- [x] Integration tests added
+- [ ] Smoke validation passes
+- [ ] Dashboard visibility verified (overview + traces + action center)
+
+### Docs and DX
+- [x] `/docs/integrations` status matrix shows `official | beta | planned`
+- [x] Matrix includes language support, example links, and test coverage badge
+- [x] Add "choose your stack" onboarding path in docs
+
+## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
 
 - [ ] Stand up `tokvera-gateway` service
 - [ ] Implement `/v1/chat/completions` proxy compatibility
@@ -93,6 +130,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Emit canonical telemetry from gateway path
 - [ ] p95 proxy overhead target (<80ms non-streaming)
 - [ ] Two tenants on real traffic through gateway alpha
+- [ ] Start Phase C only after M4.4 integration gate is complete
 
 ## Phase D (Savings Demo / M6) - Oct 1 to Dec 15, 2026
 
