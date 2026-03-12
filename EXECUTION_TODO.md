@@ -74,9 +74,9 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Retry/fallback reason and decision chain fully visible
 
 ### Eval Signals v1
-- [ ] Normalize feedback/outcome/quality signals end-to-end
-- [ ] Cost-to-quality KPI at trace and feature level
-- [ ] Add API contract tests for eval signal fields
+- [x] Normalize feedback/outcome/quality signals end-to-end
+- [x] Cost-to-quality KPI at trace and feature level
+- [x] Add API contract tests for eval signal fields
 
 ### Exit Criteria
 - [ ] Alert -> root cause -> trace evidence workflow under 5 minutes
