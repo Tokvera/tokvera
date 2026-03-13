@@ -1,61 +1,45 @@
 # Tokvera
 
-AI Cost Intelligence for SaaS
+Tokvera is the AI Cost and Trace Intelligence control plane for SaaS.
 
-## What Tokvera Is
+This repository is the public coordination and documentation entry point for the Tokvera platform.
 
-Tokvera is infrastructure for measuring, understanding, and controlling AI spend in production SaaS systems.  
-It focuses on request-level cost telemetry, model usage visibility, and operational guardrails.
+## What Is Shipped
 
-## Why It Exists
+- JavaScript SDK (`@tokvera/sdk`) and Python SDK (`tokvera`) with OpenAI, Anthropic, and Gemini tracking
+- Canonical telemetry schema support (event envelope v1 and v2)
+- Trace context + evaluation signal capture for cost and quality analysis
+- Integration expansion coverage across web frameworks, job workers, and agent stacks
+- Billing and entitlement model with project-level controls
 
-AI usage costs are often fragmented across providers, teams, and services.  
-Without consistent cost instrumentation, teams cannot answer basic questions:
+## Repositories
 
-- Which features drive spend?
-- Which users or tenants are most expensive to serve?
-- Where are cost anomalies introduced?
-
-Tokvera exists to make those answers observable by default.
+- `tokvera`: public roadmap, docs links, examples, execution checklist
+- `tokvera-js`: JavaScript SDK
+- `tokvera-python`: Python SDK
+- `tokvera-api`: ingestion, auth, billing, traces, integrations API
+- `tokvera-dashboard`: app + docs + onboarding UX
+- `tokvera-analytics-engine`: async aggregation, budgets, anomalies
 
 ## SDKs
 
-- JavaScript SDK: [`@tokvera/sdk` on npm](https://www.npmjs.com/package/@tokvera/sdk)
-- Python SDK: [`tokvera` on PyPI](https://pypi.org/project/tokvera/)
+- JavaScript: `https://www.npmjs.com/package/@tokvera/sdk`
+- Python: `https://pypi.org/project/tokvera/`
 
 ## Examples
 
-Public runnable examples are available in [`examples/`](examples/README.md):
+- `examples/node`
+- `examples/python`
+- `test/sdk-examples` (smoke and production-gate helpers)
 
-- Node SDK example: [`examples/node`](examples/node)
-- Python SDK example: [`examples/python`](examples/python)
+These include trace context, evaluation signals, and framework integration patterns.
 
-Both examples include Trace Context v1 fields (`trace_id`, `conversation_id`, `span_id`, `parent_span_id`, `step_name`).
-The examples also include Evaluation Signals v1 and integration demos for middleware/callback helpers.
+## Strategy Docs
 
-## Privacy-First Approach
+- Product roadmap: `ROADMAP.md`
+- 12-month execution checklist: `EXECUTION_TODO.md`
 
-- No training on customer data
-- Data minimization by default
-- Clear control over what telemetry is collected
-- Designed for production compliance requirements
+## Product Links
 
-## Roadmap
-
-- Observability SDKs for JS and Python
-- Streaming ingestion and advanced cost metrics
-- Budget alerts and anomaly detection
-- AI gateway mode for policy and routing control
-- Optimization workflows and control plane tooling
-
-See `ROADMAP.md` for details.
-
-## Contributing
-
-Contributions are welcome.  
-Read `CONTRIBUTING.md` before opening issues or pull requests.
-
-## Contact
-
-- Security: `security@tokvera.com`
-- General: open a GitHub issue in this repository
+- App and docs: `https://tokvera.org`
+- API base: `https://api.tokvera.org`
