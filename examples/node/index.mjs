@@ -68,6 +68,7 @@ async function main() {
     step_name: "classify_intent",
     span_kind: "orchestrator",
     capture_content: true,
+    emitLifecycleEvents: true,
     payload_blocks: [
       {
         payload_type: "context",
@@ -109,6 +110,7 @@ async function main() {
     step_name: "draft_reply",
     span_kind: "model",
     capture_content: true,
+    emitLifecycleEvents: true,
     payload_blocks: [
       {
         payload_type: "context",
@@ -144,6 +146,10 @@ async function main() {
     rootSpanId,
     draftSpanId,
     ingestUrl,
+    liveTracing: {
+      enabled: true,
+      feed: "/dashboard/traces/live",
+    },
     evaluationSignals: {
       outcome: "success",
       quality_label: "good",

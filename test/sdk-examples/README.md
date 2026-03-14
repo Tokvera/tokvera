@@ -30,6 +30,7 @@ Expected result:
 
 - Node example sends `chat.completions.create` and `responses.create` events.
 - Python example sends `chat.completions.create` and `responses.create` events.
+- Current SDK examples also emit lifecycle start events so `/dashboard/traces/live` can show in-progress rows before terminal success/failure lands.
 - Both examples emit Trace Context v2 (`schema_version=2026-04-01`) with `trace_id`, `run_id`, `span_id`, `parent_span_id`, `step_name`.
 - Both examples include v2 diagnostics fields: `span_kind`, `metrics`, `decision`, and `payload_blocks`.
 - Final output confirms at least 4 total ingested events.
@@ -63,6 +64,7 @@ Expected result:
 
 - `GET /health` returns success.
 - Node and Python examples each emit 2 events to `/v1/events`.
+- When using the current SDK releases, lifecycle start events also feed `/v1/traces/live` for realtime verification.
 - `/v1/metrics/breakdown?group_by=feature` shows both generated smoke features incrementing.
 - `/v1/traces` and `/v1/traces/:traceId` can be used to inspect emitted trace chains.
 

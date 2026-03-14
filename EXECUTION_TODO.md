@@ -158,7 +158,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Smoke scripts updated
 - [ ] Public `/docs` pages updated for all user-facing behavior changes
 - [ ] API docs/runbook updated for backend contract/ops changes
-- [ ] SDK README/examples updated for SDK contract/integration changes
+- [x] SDK README/examples updated for SDK contract/integration changes
 - [ ] Deployment env variables reviewed
 - [ ] Rollback plan documented
 

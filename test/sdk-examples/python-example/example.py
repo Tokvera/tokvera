@@ -102,6 +102,7 @@ def main() -> None:
         step_name="plan_response",
         span_kind="orchestrator",
         capture_content=True,
+        emit_lifecycle_events=True,
         payload_blocks=[
             {
                 "payload_type": "context",
@@ -140,6 +141,7 @@ def main() -> None:
         step_name="draft_response",
         span_kind="model",
         capture_content=True,
+        emit_lifecycle_events=True,
         payload_blocks=[
             {
                 "payload_type": "context",
@@ -160,7 +162,9 @@ def main() -> None:
 
     # Python SDK ingestion runs on daemon thread. Wait before process exit.
     time.sleep(wait_seconds)
-    print(f"python example complete (feature={feature}, ingest={ingest_url}, trace_id={trace_id})")
+    print(
+        f"python example complete (feature={feature}, ingest={ingest_url}, trace_id={trace_id}, live=/dashboard/traces/live)"
+    )
 
 
 if __name__ == "__main__":

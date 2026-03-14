@@ -113,6 +113,7 @@ async def run_fastapi_middleware_example(api_key: str, feature: str) -> dict[str
         client = track_openai(
             FakeOpenAI(),
             api_key=api_key,
+            emit_lifecycle_events=True,
             **track_kwargs,
         )
         client.chat.completions.create(
@@ -138,6 +139,7 @@ def run_langchain_callback_example(api_key: str, feature: str) -> None:
         conversation_id=next_id("conv"),
         quality_label="good",
         feedback_score=5,
+        emit_lifecycle_events=True,
     )
 
     run_id = next_id("run")
@@ -168,6 +170,7 @@ def run_llamaindex_callback_example(api_key: str, feature: str) -> None:
         tenant_id="example_tenant",
         quality_label="good",
         feedback_score=4,
+        emit_lifecycle_events=True,
     )
 
     event_id = callback.on_event_start(
@@ -210,6 +213,10 @@ def main() -> None:
             "feature": feature,
             "ingest_url": ingest_url,
             "middleware_trace_header": fastapi_headers.get("x-tokvera-trace-id"),
+            "live_tracing": {
+                "enabled": True,
+                "feed": "/dashboard/traces/live",
+            },
             "examples": [
                 "fastapi_middleware",
                 "langchain_callback",

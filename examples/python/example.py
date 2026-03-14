@@ -100,6 +100,7 @@ def main() -> None:
         step_name="classify_intent",
         span_kind="orchestrator",
         capture_content=True,
+        emit_lifecycle_events=True,
         payload_blocks=[
             {
                 "payload_type": "context",
@@ -139,6 +140,7 @@ def main() -> None:
         step_name="draft_reply",
         span_kind="model",
         capture_content=True,
+        emit_lifecycle_events=True,
         payload_blocks=[
             {
                 "payload_type": "context",
@@ -170,6 +172,10 @@ def main() -> None:
             "root_span_id": root_span_id,
             "draft_span_id": draft_span_id,
             "ingest_url": ingest_url,
+            "live_tracing": {
+                "enabled": True,
+                "feed": "/dashboard/traces/live",
+            },
             "evaluation_signals": {
                 "outcome": "success",
                 "quality_label": "good",

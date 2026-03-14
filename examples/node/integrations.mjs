@@ -82,6 +82,7 @@ async function runExpressMiddlewareExample({ apiKey, ingestUrl, feature }) {
       api_key: apiKey,
       ingest_url: ingestUrl,
       step_name: "draft_reply",
+      emitLifecycleEvents: true,
     })
   );
 
@@ -102,6 +103,7 @@ async function runLangChainCallbackExample({ apiKey, ingestUrl, feature }) {
     conversation_id: nextId("conv"),
     quality_label: "good",
     feedback_score: 5,
+    emitLifecycleEvents: true,
   });
 
   const runId = nextId("run");
@@ -154,6 +156,7 @@ async function runVercelAIHelperExample({ apiKey, ingestUrl, feature }) {
     step_name: "vercel_answer",
     quality_label: "good",
     feedback_score: 4,
+    emitLifecycleEvents: true,
   });
 
   await trackedGenerateText({
@@ -184,6 +187,10 @@ async function main() {
     ingestUrl,
     middlewareTraceId: middlewareContext?.trace_id,
     middlewareRunId: middlewareContext?.run_id,
+    liveTracing: {
+      enabled: true,
+      feed: "/dashboard/traces/live",
+    },
     examples: ["express_middleware", "langchain_callback", "vercel_ai_wrapper"],
   });
 }

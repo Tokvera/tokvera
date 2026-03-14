@@ -60,6 +60,7 @@ async function main() {
     step_name: "plan_response",
     span_kind: "orchestrator",
     capture_content: true,
+    emitLifecycleEvents: true,
     payload_blocks: [
       {
         payload_type: "context",
@@ -101,6 +102,7 @@ async function main() {
     step_name: "draft_response",
     span_kind: "model",
     capture_content: true,
+    emitLifecycleEvents: true,
     payload_blocks: [
       {
         payload_type: "context",
@@ -127,7 +129,7 @@ async function main() {
   // SDK sends ingestion in fire-and-forget mode.
   await new Promise((resolve) => setTimeout(resolve, waitMs));
   console.log(
-    `node example complete (feature=${feature}, ingest=${process.env.TOKVERA_INGEST_URL}, trace_id=${traceId})`
+    `node example complete (feature=${feature}, ingest=${process.env.TOKVERA_INGEST_URL}, trace_id=${traceId}, live=/dashboard/traces/live)`
   );
 }
 
