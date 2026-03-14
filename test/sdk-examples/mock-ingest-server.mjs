@@ -27,6 +27,42 @@ function uniqueValues(items, selector) {
 }
 
 function buildStats() {
+  const lifecycleKeys = new Map();
+  for (const event of events) {
+    const traceId = toNonEmptyString(event?.tags?.trace_id);
+    const spanId = toNonEmptyString(event?.tags?.span_id);
+    const status = toNonEmptyString(event?.status);
+    if (!traceId || !spanId || !status) continue;
+    const key = `${traceId}:${spanId}`;
+    const current = lifecycleKeys.get(key) ?? { in_progress: 0, success: 0, failure: 0 };
+    if (status === "in_progress" || status === "success" || status === "failure") {
+      current[status] += 1;
+      lifecycleKeys.set(key, current);
+    }
+  }
+  const lifecycleSummary = {
+    with_start_and_terminal: 0,
+    success_only: 0,
+    failure_only: 0,
+    invalid: 0,
+  };
+  for (const counts of lifecycleKeys.values()) {
+    const hasStart = counts.in_progress > 0;
+    const hasSuccess = counts.success > 0;
+    const hasFailure = counts.failure > 0;
+    const duplicateStatus = counts.in_progress > 1 || counts.success > 1 || counts.failure > 1;
+    if (duplicateStatus || (hasSuccess && hasFailure)) {
+      lifecycleSummary.invalid += 1;
+    } else if (hasStart && (hasSuccess || hasFailure)) {
+      lifecycleSummary.with_start_and_terminal += 1;
+    } else if (!hasStart && hasSuccess) {
+      lifecycleSummary.success_only += 1;
+    } else if (!hasStart && hasFailure) {
+      lifecycleSummary.failure_only += 1;
+    } else {
+      lifecycleSummary.invalid += 1;
+    }
+  }
   return {
     ok: true,
     count: events.length,
@@ -38,6 +74,7 @@ function buildStats() {
     step_names: summarizeCounts(events, (item) => toNonEmptyString(item?.tags?.step_name)),
     trace_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.trace_id)),
     run_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.run_id)),
+    lifecycle: lifecycleSummary,
   };
 }
 
@@ -57,6 +94,10 @@ const server = http.createServer((req, res) => {
 
   if (req.method === "GET" && req.url === "/stats") {
     return sendJson(res, 200, buildStats());
+  }
+
+  if (req.method === "GET" && req.url === "/events") {
+    return sendJson(res, 200, { ok: true, count: events.length, items: events });
   }
 
   if (req.method === "DELETE" && req.url === "/stats") {

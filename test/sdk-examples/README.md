@@ -7,6 +7,7 @@ This folder contains smoke tests for both published Tokvera SDKs:
 
 There are two runners:
 - Local mock smoke (`run-smoke.mjs`): validates SDK emission to a local test server.
+- Local integration soak (`run-integration-soak.mjs`): repeats the runtime-helper matrix against the local test server and verifies no duplicate `(trace_id, span_id, status)` emissions plus complete lifecycle pairs.
 - Production smoke (`run-production-smoke.mjs`): validates deployed API + analytics metric increments.
 - Runtime helper visibility (`run-runtime-helper-visibility.mjs`): emits existing-app/manual tracer, Mistral, OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces, then verifies overview/traces/live/detail/inspector/action-center visibility.
 - First paying-user flow (`run-first-paying-user-flow.mjs`): validates login, project/key provisioning, SDK ingestion, metrics, and billing metering.
@@ -15,6 +16,7 @@ There are two runners:
 
 - `mock-ingest-server.mjs`: local HTTP server for `POST /v1/events`
 - `run-smoke.mjs`: orchestrates setup + example execution + verification
+- `run-integration-soak.mjs`: repeats runtime helper execution and checks duplicate/lifecycle stability
 - `run-production-smoke.mjs`: validates `health`, emits events, and checks feature breakdown increments
 - `run-runtime-helper-visibility.mjs`: validates runtime helper visibility through dashboard-facing APIs
 - `node-example/`: JavaScript SDK example app
@@ -43,6 +45,27 @@ Python example notes:
 - Uses a compatibility wrapper so smoke still runs with older published `tokvera` versions that do not yet accept every v2 keyword argument.
 - Runtime helper smoke prefers a local sibling `../tokvera-python` checkout on `PYTHONPATH` when present so unreleased Python helper surfaces can still be verified before PyPI publish catches up.
 - Runtime helper smoke also prefers a local sibling `../tokvera-js` checkout when present so unreleased JS helper surfaces can be verified before npm publish catches up.
+
+## Run Local Integration Soak
+
+From this folder:
+
+```bash
+node run-integration-soak.mjs
+```
+
+Optional:
+
+```bash
+export TOKVERA_SOAK_ROUNDS="2"
+```
+
+Expected result:
+
+- Repeats the full runtime-helper matrix for Node and Python.
+- Verifies there are no duplicate `(trace_id, span_id, status)` emissions.
+- Verifies lifecycle pairs are complete (`in_progress -> success|failure`) for lifecycle-enabled spans.
+- Allows success-only spans for OTel bridge coverage.
 
 ## Run Production Smoke
 

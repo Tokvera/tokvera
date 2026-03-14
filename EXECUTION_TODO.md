@@ -135,6 +135,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add Wave 2 beta helper APIs in JS/Python for AutoGen, Mastra, Temporal, Pipecat, LiveKit, and OpenAI-compatible gateway
 - [x] Add SDK examples, tests, and README coverage for Wave 2 beta helpers
 - [x] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
+- [x] Add duplicate-emission regression tests for mixed manual/wrapper/runtime-helper compositions
+- [x] Add local integration soak gate for lifecycle completeness and duplicate `(trace_id, span_id, status)` detection
 
 ## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
 
