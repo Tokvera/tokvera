@@ -1,6 +1,6 @@
 # Tokvera Execution TODO (Mar 11, 2026 -> Mar 31, 2027)
 
-Last updated: 2026-03-12
+Last updated: 2026-03-14
 Owner: product + engineering
 Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
@@ -120,6 +120,15 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] `/docs/integrations` status matrix shows `official | beta | planned`
 - [x] Matrix includes language support, example links, and test coverage badge
 - [x] Add "choose your stack" onboarding path in docs
+
+### Integration Superset (Existing-App First)
+- [x] Ship JS/Python manual tracer substrate for custom apps and multi-model runs
+- [x] Add Mistral provider wrapper on the canonical telemetry contract
+- [x] Add OpenTelemetry bridge helpers that convert spans into canonical Tokvera trace events
+- [x] Add thin runtime helper APIs for OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, and CrewAI
+- [x] Expand tracing setup + docs to group integrations by existing app, providers, agent SDKs, frameworks, workflows, voice/realtime, and connectors
+- [ ] Complete smoke validation and dashboard visibility verification for every newly added runtime helper
+- [ ] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
 
 ## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
 

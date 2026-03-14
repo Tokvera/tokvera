@@ -68,6 +68,24 @@ Goal: broaden integration space before gateway to maximize real production adopt
   - integration tests
   - smoke visibility in overview/traces/action center
   - dashboard verification
+- Add an existing-app-first tracing substrate so custom apps and multi-model stacks do not wait on framework-specific wrappers:
+  - JS + Python manual tracer APIs
+  - lifecycle-compatible root/child span emission
+  - one-trace composition across wrappers, workers, and custom orchestration
+- Expand beyond the original 12 surfaces with higher-value trace engineering integrations:
+  - Mistral provider wrapper
+  - OpenTelemetry bridge (inbound spans to canonical Tokvera events)
+  - OpenAI Agents SDK helper
+  - Claude Agent SDK helper
+  - Google ADK helper
+  - LangGraph helper
+  - Instructor helper
+  - PydanticAI helper
+  - CrewAI helper
+- Publish broader catalog tiers for acquisition and demand shaping:
+  - `official`: existing app, providers, hardened frameworks/workers, agent/runtime helpers that pass contract + lifecycle gates
+  - `beta`: AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway integration
+  - `planned`: Semantic Kernel, Microsoft Agent Framework, Deep Agents, non-JS/non-Python surfaces
 
 ### Phase 3: Gateway Alpha (M5)
 
