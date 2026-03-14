@@ -8,6 +8,6 @@
     "runtime-helpers": "node runtime-helpers.mjs"
   },
   "dependencies": {
-    "@tokvera/sdk": "0.2.8"
+    "@tokvera/sdk": "^0.2.9"
   }
 }
