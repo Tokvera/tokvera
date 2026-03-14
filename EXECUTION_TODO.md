@@ -16,7 +16,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Milestone Targets
 
 - [ ] M4 First paying user by 2026-05-31
-- [ ] M4.4 Integration Platform v1 (12 official integrations) by 2026-08-31
+- [x] M4.4 Integration Platform v1 (12 official integrations) by 2026-08-31
 - [ ] M4.5 Tracing beta completion by 2026-06-30
 - [ ] M4.6 Evaluation signals v1 by 2026-06-30
 - [ ] M5 Gateway alpha by 2026-10-31
@@ -131,6 +131,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Expand tracing setup + docs to group integrations by existing app, providers, agent SDKs, frameworks, workflows, voice/realtime, and connectors
 - [x] Local smoke validates the new runtime helper matrix end-to-end
 - [x] Complete smoke validation and dashboard visibility verification for every newly added runtime helper
+- [x] Promote Wave 1 runtime helpers (OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI) to `official`
 - [ ] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
 
 ## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
