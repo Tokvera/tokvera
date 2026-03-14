@@ -3,6 +3,44 @@ import http from "node:http";
 const port = Number(process.env.MOCK_INGEST_PORT || 8787);
 const events = [];
 
+function toNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
+function summarizeCounts(items, selector) {
+  return items.reduce((acc, item) => {
+    const value = selector(item);
+    if (!value) return acc;
+    acc[value] = (acc[value] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function uniqueValues(items, selector) {
+  return Array.from(
+    new Set(
+      items
+        .map((item) => selector(item))
+        .filter((value) => typeof value === "string" && value.length > 0)
+    )
+  );
+}
+
+function buildStats() {
+  return {
+    ok: true,
+    count: events.length,
+    endpoints: events.map((item) => item.endpoint),
+    features: summarizeCounts(events, (item) => toNonEmptyString(item?.tags?.feature)),
+    providers: summarizeCounts(events, (item) => toNonEmptyString(item?.provider)),
+    statuses: summarizeCounts(events, (item) => toNonEmptyString(item?.status)),
+    event_types: summarizeCounts(events, (item) => toNonEmptyString(item?.event_type)),
+    step_names: summarizeCounts(events, (item) => toNonEmptyString(item?.tags?.step_name)),
+    trace_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.trace_id)),
+    run_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.run_id)),
+  };
+}
+
 function sendJson(res, statusCode, body) {
   const payload = JSON.stringify(body);
   res.writeHead(statusCode, {
@@ -18,11 +56,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/stats") {
-    return sendJson(res, 200, {
-      ok: true,
-      count: events.length,
-      endpoints: events.map((item) => item.endpoint),
-    });
+    return sendJson(res, 200, buildStats());
   }
 
   if (req.method === "DELETE" && req.url === "/stats") {

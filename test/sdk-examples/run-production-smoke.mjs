@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const nodeExampleDir = path.join(__dirname, "node-example");
 const pythonExamplePath = path.join(__dirname, "python-example", "example.py");
+const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 
 const baseUrl = (process.env.TOKVERA_API_BASE_URL || "https://api.tokvera.org").replace(/\/$/, "");
 const ingestUrl = process.env.TOKVERA_INGEST_URL || `${baseUrl}/v1/events`;
@@ -35,6 +37,18 @@ const sharedEnv = {
   TOKVERA_WAIT_SECONDS: process.env.TOKVERA_WAIT_SECONDS || "4",
   TOKVERA_WAIT_MS: process.env.TOKVERA_WAIT_MS || "1800",
 };
+
+function hasLocalPythonSdk() {
+  return fs.existsSync(path.join(localPythonSdkDir, "tokvera", "__init__.py"));
+}
+
+function buildPythonEnv(baseEnv) {
+  if (!hasLocalPythonSdk()) return { ...baseEnv };
+  return {
+    ...baseEnv,
+    PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
+  };
+}
 
 function run(command, args, options = {}) {
   return new Promise((resolve, reject) => {
@@ -173,14 +187,40 @@ async function main() {
   });
 
   console.log("[prod-smoke] running python sdk example");
-  const uvCommand = await resolveUvCommand();
-  await run(uvCommand, ["run", "--with", "tokvera", pythonExamplePath], {
-    cwd: __dirname,
-    env: {
-      ...sharedEnv,
-      TOKVERA_FEATURE: pythonFeature,
-    },
-  });
+  const pythonEnv = {
+    ...buildPythonEnv(sharedEnv),
+    TOKVERA_FEATURE: pythonFeature,
+  };
+  if (hasLocalPythonSdk()) {
+    const candidates = [
+      { command: "python", prefix: [] },
+      { command: "py", prefix: ["-3"] },
+    ];
+    let resolved = null;
+    for (const candidate of candidates) {
+      try {
+        await run(candidate.command, [...candidate.prefix, "--version"], { silent: true });
+        resolved = candidate;
+        break;
+      } catch {
+        // try next candidate
+      }
+    }
+    if (!resolved) {
+      throw new Error("Python interpreter not found (tried: python, py -3)");
+    }
+    console.log(`[prod-smoke] using local python sdk from ${localPythonSdkDir}`);
+    await run(resolved.command, [...resolved.prefix, pythonExamplePath], {
+      cwd: __dirname,
+      env: pythonEnv,
+    });
+  } else {
+    const uvCommand = await resolveUvCommand();
+    await run(uvCommand, ["run", "--with", "tokvera", pythonExamplePath], {
+      cwd: __dirname,
+      env: pythonEnv,
+    });
+  }
 
   console.log("[prod-smoke] waiting for aggregated metrics");
   const after = await waitForCounts([

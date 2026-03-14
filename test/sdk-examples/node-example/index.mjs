@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { trackOpenAI } from "@tokvera/sdk";
+import { loadLocalEnv } from "./env.mjs";
 
 const fakeOpenAI = {
   chat: {
@@ -37,6 +38,8 @@ function nextId(prefix) {
 }
 
 async function main() {
+  loadLocalEnv();
+
   const feature = process.env.TOKVERA_FEATURE || "sdk_smoke_node";
   const waitMs = Number(process.env.TOKVERA_WAIT_MS || 1200);
   const traceId = nextId("trc");

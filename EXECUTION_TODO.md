@@ -113,8 +113,10 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Docs page published and linked under `/docs/integrations`
 - [x] Runnable example available
 - [x] Integration tests added
-- [ ] Smoke validation passes
-- [ ] Dashboard visibility verified (overview + traces + action center)
+- [x] Add local runtime-helper smoke matrix in `tokvera/test/sdk-examples/run-smoke.mjs`
+- [x] Add production visibility gate in `tokvera/test/sdk-examples/run-runtime-helper-visibility.mjs`
+- [x] Smoke validation passes
+- [x] Dashboard visibility verified (overview + traces + action center)
 
 ### Docs and DX
 - [x] `/docs/integrations` status matrix shows `official | beta | planned`
@@ -127,7 +129,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add OpenTelemetry bridge helpers that convert spans into canonical Tokvera trace events
 - [x] Add thin runtime helper APIs for OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, and CrewAI
 - [x] Expand tracing setup + docs to group integrations by existing app, providers, agent SDKs, frameworks, workflows, voice/realtime, and connectors
-- [ ] Complete smoke validation and dashboard visibility verification for every newly added runtime helper
+- [x] Local smoke validates the new runtime helper matrix end-to-end
+- [x] Complete smoke validation and dashboard visibility verification for every newly added runtime helper
 - [ ] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
 
 ## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026

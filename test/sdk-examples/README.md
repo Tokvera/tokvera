@@ -8,6 +8,7 @@ This folder contains smoke tests for both published Tokvera SDKs:
 There are two runners:
 - Local mock smoke (`run-smoke.mjs`): validates SDK emission to a local test server.
 - Production smoke (`run-production-smoke.mjs`): validates deployed API + analytics metric increments.
+- Runtime helper visibility (`run-runtime-helper-visibility.mjs`): emits existing-app/manual tracer, Mistral, OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, and OTel bridge traces, then verifies overview/traces/live/detail/inspector/action-center visibility.
 - First paying-user flow (`run-first-paying-user-flow.mjs`): validates login, project/key provisioning, SDK ingestion, metrics, and billing metering.
 
 ## Structure
@@ -15,6 +16,7 @@ There are two runners:
 - `mock-ingest-server.mjs`: local HTTP server for `POST /v1/events`
 - `run-smoke.mjs`: orchestrates setup + example execution + verification
 - `run-production-smoke.mjs`: validates `health`, emits events, and checks feature breakdown increments
+- `run-runtime-helper-visibility.mjs`: validates runtime helper visibility through dashboard-facing APIs
 - `node-example/`: JavaScript SDK example app
 - `python-example/`: Python SDK example app
 
@@ -30,13 +32,16 @@ Expected result:
 
 - Node example sends `chat.completions.create` and `responses.create` events.
 - Python example sends `chat.completions.create` and `responses.create` events.
+- Node runtime helper example emits manual tracer, Mistral, OpenAI Agents, LangGraph, and OTel bridge traces.
+- Python runtime helper example emits manual tracer, Mistral, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, and OTel bridge traces.
 - Current SDK examples also emit lifecycle start events so `/dashboard/traces/live` can show in-progress rows before terminal success/failure lands.
 - Both examples emit Trace Context v2 (`schema_version=2026-04-01`) with `trace_id`, `run_id`, `span_id`, `parent_span_id`, `step_name`.
 - Both examples include v2 diagnostics fields: `span_kind`, `metrics`, `decision`, and `payload_blocks`.
-- Final output confirms at least 4 total ingested events.
+- Final output confirms feature/provider/lifecycle coverage for the runtime helper matrix, not just a raw event count.
 
 Python example notes:
 - Uses a compatibility wrapper so smoke still runs with older published `tokvera` versions that do not yet accept every v2 keyword argument.
+- Runtime helper smoke prefers a local sibling `../tokvera-python` checkout on `PYTHONPATH` when present so unreleased Python helper surfaces can still be verified before PyPI publish catches up.
 
 ## Run Production Smoke
 
@@ -67,6 +72,56 @@ Expected result:
 - When using the current SDK releases, lifecycle start events also feed `/v1/traces/live` for realtime verification.
 - `/v1/metrics/breakdown?group_by=feature` shows both generated smoke features incrementing.
 - `/v1/traces` and `/v1/traces/:traceId` can be used to inspect emitted trace chains.
+
+## Run Runtime Helper Visibility Gate
+
+Required:
+
+```bash
+export TOKVERA_API_KEY="tkv_your_project_key"
+```
+
+Optional:
+
+```bash
+export TOKVERA_API_BASE_URL="https://api.tokvera.org"
+export SMOKE_VISIBILITY_TIMEOUT_SECONDS="120"
+export SMOKE_VISIBILITY_POLL_SECONDS="5"
+```
+
+Run:
+
+```bash
+node run-runtime-helper-visibility.mjs
+```
+
+Expected result:
+
+- Emits runtime-helper traces for:
+  - existing app / manual tracer
+  - Mistral
+  - OpenAI Agents SDK
+  - Claude Agent SDK
+  - Google ADK
+  - LangGraph
+  - Instructor
+  - PydanticAI
+  - CrewAI
+  - OTel bridge
+- Verifies visibility through:
+  - `/v1/metrics/overview`
+  - `/v1/metrics/breakdown?group_by=feature`
+  - `/v1/metrics/traces`
+  - `/v1/traces/live`
+  - `/v1/traces/:traceId`
+  - `/v1/traces/:traceId/inspector`
+  - `/v1/metrics/action-center`
+
+Operational notes:
+
+- This gate assumes the target project key belongs to a plan with Trace Explorer and Action Center entitlements.
+- If a local sibling `../tokvera-python` checkout is present, the script uses it automatically so unreleased Python helper surfaces can still be validated.
+- The runner uses a broad metrics window for overview/breakdown checks and a short current-run window for Action Center so global top-N ranking does not hide the newly emitted helper batch.
 
 ## Run First Paying-User Flow Smoke
 

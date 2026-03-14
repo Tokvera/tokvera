@@ -4,9 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "example": "node index.mjs"
+    "example": "node index.mjs",
+    "runtime-helpers": "node runtime-helpers.mjs"
   },
   "dependencies": {
-    "@tokvera/sdk": "latest"
+    "@tokvera/sdk": "0.2.8"
   }
 }
