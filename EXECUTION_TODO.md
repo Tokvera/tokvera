@@ -134,7 +134,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Promote Wave 1 runtime helpers (OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI) to `official`
 - [x] Add Wave 2 beta helper APIs in JS/Python for AutoGen, Mastra, Temporal, Pipecat, LiveKit, and OpenAI-compatible gateway
 - [x] Add SDK examples, tests, and README coverage for Wave 2 beta helpers
-- [ ] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
+- [x] Promote Wave 2 beta integrations (AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway) after contract + lifecycle gate
 
 ## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
 

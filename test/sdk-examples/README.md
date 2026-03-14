@@ -8,7 +8,7 @@ This folder contains smoke tests for both published Tokvera SDKs:
 There are two runners:
 - Local mock smoke (`run-smoke.mjs`): validates SDK emission to a local test server.
 - Production smoke (`run-production-smoke.mjs`): validates deployed API + analytics metric increments.
-- Runtime helper visibility (`run-runtime-helper-visibility.mjs`): emits existing-app/manual tracer, Mistral, OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, and OTel bridge traces, then verifies overview/traces/live/detail/inspector/action-center visibility.
+- Runtime helper visibility (`run-runtime-helper-visibility.mjs`): emits existing-app/manual tracer, Mistral, OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces, then verifies overview/traces/live/detail/inspector/action-center visibility.
 - First paying-user flow (`run-first-paying-user-flow.mjs`): validates login, project/key provisioning, SDK ingestion, metrics, and billing metering.
 
 ## Structure
@@ -32,8 +32,8 @@ Expected result:
 
 - Node example sends `chat.completions.create` and `responses.create` events.
 - Python example sends `chat.completions.create` and `responses.create` events.
-- Node runtime helper example emits manual tracer, Mistral, OpenAI Agents, LangGraph, and OTel bridge traces.
-- Python runtime helper example emits manual tracer, Mistral, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, and OTel bridge traces.
+- Node runtime helper example emits manual tracer, Mistral, OpenAI Agents, LangGraph, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces.
+- Python runtime helper example emits manual tracer, Mistral, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces.
 - Current SDK examples also emit lifecycle start events so `/dashboard/traces/live` can show in-progress rows before terminal success/failure lands.
 - Both examples emit Trace Context v2 (`schema_version=2026-04-01`) with `trace_id`, `run_id`, `span_id`, `parent_span_id`, `step_name`.
 - Both examples include v2 diagnostics fields: `span_kind`, `metrics`, `decision`, and `payload_blocks`.
@@ -42,6 +42,7 @@ Expected result:
 Python example notes:
 - Uses a compatibility wrapper so smoke still runs with older published `tokvera` versions that do not yet accept every v2 keyword argument.
 - Runtime helper smoke prefers a local sibling `../tokvera-python` checkout on `PYTHONPATH` when present so unreleased Python helper surfaces can still be verified before PyPI publish catches up.
+- Runtime helper smoke also prefers a local sibling `../tokvera-js` checkout when present so unreleased JS helper surfaces can be verified before npm publish catches up.
 
 ## Run Production Smoke
 
@@ -107,6 +108,12 @@ Expected result:
   - Instructor
   - PydanticAI
   - CrewAI
+  - AutoGen
+  - Mastra
+  - Temporal
+  - Pipecat
+  - LiveKit
+  - OpenAI-compatible gateway
   - OTel bridge
 - Verifies visibility through:
   - `/v1/metrics/overview`
@@ -121,6 +128,7 @@ Operational notes:
 
 - This gate assumes the target project key belongs to a plan with Trace Explorer and Action Center entitlements.
 - If a local sibling `../tokvera-python` checkout is present, the script uses it automatically so unreleased Python helper surfaces can still be validated.
+- If a local sibling `../tokvera-js` checkout is present, the script builds and installs it into the node example so unreleased JS helper surfaces can still be validated.
 - The runner uses a broad metrics window for overview/breakdown checks and a short current-run window for Action Center so global top-N ranking does not hide the newly emitted helper batch.
 
 ## Run First Paying-User Flow Smoke

@@ -9,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const nodeExampleDir = path.join(__dirname, "node-example");
 const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime_helpers.py");
+const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
@@ -33,6 +34,12 @@ const nodeFeatures = {
   mistral: `vis_mistral_js_${now}`,
   openaiAgents: `vis_openai_agents_js_${now}`,
   langgraph: `vis_langgraph_js_${now}`,
+  autogen: `vis_autogen_js_${now}`,
+  mastra: `vis_mastra_js_${now}`,
+  temporal: `vis_temporal_js_${now}`,
+  pipecat: `vis_pipecat_js_${now}`,
+  livekit: `vis_livekit_js_${now}`,
+  gateway: `vis_gateway_js_${now}`,
   otel: `vis_otel_js_${now}`,
 };
 
@@ -45,18 +52,24 @@ const pythonFeatures = {
   instructor: `vis_instructor_py_${now}`,
   pydanticai: `vis_pydanticai_py_${now}`,
   crewai: `vis_crewai_py_${now}`,
+  autogen: `vis_autogen_py_${now}`,
+  mastra: `vis_mastra_py_${now}`,
+  temporal: `vis_temporal_py_${now}`,
+  pipecat: `vis_pipecat_py_${now}`,
+  livekit: `vis_livekit_py_${now}`,
+  gateway: `vis_gateway_py_${now}`,
   otel: `vis_otel_py_${now}`,
 };
 
 const allFeatures = [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
 const liveFeatures = allFeatures.filter((feature) => !feature.includes("otel"));
 const actionCenterFeatures = [
-  nodeFeatures.mistral,
-  nodeFeatures.openaiAgents,
-  nodeFeatures.langgraph,
-  pythonFeatures.mistral,
-  pythonFeatures.claudeAgent,
-  pythonFeatures.langgraph,
+  nodeFeatures.autogen,
+  nodeFeatures.temporal,
+  nodeFeatures.gateway,
+  pythonFeatures.autogen,
+  pythonFeatures.temporal,
+  pythonFeatures.gateway,
 ];
 
 function run(command, args, options = {}) {
@@ -117,12 +130,31 @@ function hasLocalPythonSdk() {
   return fs.existsSync(path.join(localPythonSdkDir, "tokvera", "__init__.py"));
 }
 
+function hasLocalNodeSdk() {
+  return fs.existsSync(path.join(localNodeSdkDir, "package.json"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
     ...baseEnv,
     PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
   };
+}
+
+async function installNodeExampleDependencies() {
+  console.log("[runtime-visibility] installing node example dependencies");
+  await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
+
+  if (!hasLocalNodeSdk()) return;
+
+  console.log(`[runtime-visibility] building local js sdk from ${localNodeSdkDir}`);
+  await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
+
+  console.log("[runtime-visibility] overriding node example with local js sdk checkout");
+  await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
+    cwd: nodeExampleDir,
+  });
 }
 
 async function resolvePythonCommand() {
@@ -192,8 +224,7 @@ async function emitRuntimeHelpers() {
     TOKVERA_WAIT_SECONDS: process.env.TOKVERA_WAIT_SECONDS || "4",
   };
 
-  console.log("[runtime-visibility] installing node example dependencies");
-  await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
+  await installNodeExampleDependencies();
 
   console.log("[runtime-visibility] emitting node runtime helper traces");
   await run(npmCommand, ["run", "runtime-helpers"], {
@@ -204,6 +235,12 @@ async function emitRuntimeHelpers() {
       TOKVERA_FEATURE_MISTRAL_JS: nodeFeatures.mistral,
       TOKVERA_FEATURE_OPENAI_AGENTS_JS: nodeFeatures.openaiAgents,
       TOKVERA_FEATURE_LANGGRAPH_JS: nodeFeatures.langgraph,
+      TOKVERA_FEATURE_AUTOGEN_JS: nodeFeatures.autogen,
+      TOKVERA_FEATURE_MASTRA_JS: nodeFeatures.mastra,
+      TOKVERA_FEATURE_TEMPORAL_JS: nodeFeatures.temporal,
+      TOKVERA_FEATURE_PIPECAT_JS: nodeFeatures.pipecat,
+      TOKVERA_FEATURE_LIVEKIT_JS: nodeFeatures.livekit,
+      TOKVERA_FEATURE_GATEWAY_JS: nodeFeatures.gateway,
       TOKVERA_FEATURE_OTEL_JS: nodeFeatures.otel,
     },
   });
@@ -218,6 +255,12 @@ async function emitRuntimeHelpers() {
     TOKVERA_FEATURE_INSTRUCTOR_PY: pythonFeatures.instructor,
     TOKVERA_FEATURE_PYDANTICAI_PY: pythonFeatures.pydanticai,
     TOKVERA_FEATURE_CREWAI_PY: pythonFeatures.crewai,
+    TOKVERA_FEATURE_AUTOGEN_PY: pythonFeatures.autogen,
+    TOKVERA_FEATURE_MASTRA_PY: pythonFeatures.mastra,
+    TOKVERA_FEATURE_TEMPORAL_PY: pythonFeatures.temporal,
+    TOKVERA_FEATURE_PIPECAT_PY: pythonFeatures.pipecat,
+    TOKVERA_FEATURE_LIVEKIT_PY: pythonFeatures.livekit,
+    TOKVERA_FEATURE_GATEWAY_PY: pythonFeatures.gateway,
     TOKVERA_FEATURE_OTEL_PY: pythonFeatures.otel,
   };
 

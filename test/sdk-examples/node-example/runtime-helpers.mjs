@@ -1,8 +1,14 @@
 import crypto from "node:crypto";
 import {
   TokveraOTelSpanExporter,
+  createTokveraAutoGenHooks,
   createTokveraLangGraphHooks,
+  createTokveraLiveKitHooks,
+  createTokveraMastraHooks,
   createTokveraOpenAIAgentsTracingProcessor,
+  createTokveraOpenAICompatibleGatewayHooks,
+  createTokveraPipecatHooks,
+  createTokveraTemporalHooks,
   createTokveraTracer,
   finishSpan,
   getTrackOptionsFromTraceContext,
@@ -239,6 +245,224 @@ async function runLangGraphFeature(baseOptions, feature) {
   });
 }
 
+async function runAutoGenFeature(baseOptions, feature) {
+  const hooks = createTokveraAutoGenHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const conversation = hooks.onConversationStart({
+    step_name: "autogen_conversation",
+    model: "multi-agent-router",
+    quality_label: "poor",
+    feedback_score: 2.8,
+    outcome: "success",
+  });
+  const agent = hooks.onAgentStart(conversation, {
+    step_name: "planner_agent",
+    routing_reason: "delegate_to_planner",
+    route: "planner_agent",
+  });
+  hooks.onAgentEnd(agent, {
+    response: { next: "search_docs" },
+    quality_label: "poor",
+    feedback_score: 2.9,
+    outcome: "success",
+  });
+  hooks.onConversationEnd(conversation, {
+    response: { status: "completed" },
+    quality_label: "poor",
+    feedback_score: 2.9,
+    outcome: "success",
+  });
+}
+
+async function runMastraFeature(baseOptions, feature) {
+  const hooks = createTokveraMastraHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const workflow = hooks.onWorkflowStart({
+    step_name: "mastra_workflow",
+    model: "workflow-router",
+    quality_label: "good",
+    feedback_score: 4.3,
+    outcome: "success",
+  });
+  const step = hooks.onStepStart(workflow, {
+    step_name: "search_docs",
+  });
+  hooks.onStepEnd(step, {
+    response: { matches: 4 },
+    quality_label: "good",
+    outcome: "success",
+  });
+  hooks.onWorkflowEnd(workflow, {
+    response: { status: "completed" },
+    quality_label: "good",
+    feedback_score: 4.5,
+    outcome: "success",
+  });
+}
+
+async function runTemporalFeature(baseOptions, feature) {
+  const hooks = createTokveraTemporalHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const workflow = hooks.onWorkflowStart({
+    step_name: "temporal_workflow",
+    model: "workflow-router",
+    quality_label: "poor",
+    feedback_score: 2.7,
+    outcome: "success",
+  });
+  const activity = hooks.onActivityStart(workflow, {
+    step_name: "lookup_account",
+    tool_name: "lookup_account",
+    retry_reason: "timeout_retry",
+  });
+  hooks.onActivityEnd(activity, {
+    response: { account_status: "active" },
+    quality_label: "poor",
+    outcome: "success",
+  });
+  hooks.onWorkflowEnd(workflow, {
+    response: { status: "completed" },
+    quality_label: "poor",
+    feedback_score: 2.9,
+    outcome: "success",
+  });
+}
+
+async function runPipecatFeature(baseOptions, feature) {
+  const hooks = createTokveraPipecatHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const turn = hooks.onTurnStart({
+    step_name: "voice_turn",
+    model: "voice-router",
+    quality_label: "good",
+    feedback_score: 4.1,
+    outcome: "success",
+  });
+  const transcript = hooks.onTranscriptionStart(turn, {
+    step_name: "speech_to_text",
+    provider: "openai",
+    model: "gpt-4o-mini-transcribe",
+  });
+  hooks.onTranscriptionEnd(transcript, {
+    response: { transcript: "Need account help" },
+    usage: { prompt_tokens: 8, completion_tokens: 5, total_tokens: 13 },
+    quality_label: "good",
+    outcome: "success",
+  });
+  hooks.onTurnEnd(turn, {
+    response: { status: "completed" },
+    quality_label: "good",
+    feedback_score: 4.2,
+    outcome: "success",
+  });
+}
+
+async function runLiveKitFeature(baseOptions, feature) {
+  const hooks = createTokveraLiveKitHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const session = hooks.onSessionStart({
+    step_name: "livekit_room_session",
+    model: "voice-agent",
+    quality_label: "good",
+    feedback_score: 4.4,
+    outcome: "success",
+  });
+  const turn = hooks.onTurnStart(session, {
+    step_name: "voice_turn",
+    provider: "openai",
+    model: "gpt-4o-realtime-preview",
+  });
+  hooks.onTurnEnd(turn, {
+    response: { transcript: "Upgrade my plan" },
+    usage: { prompt_tokens: 9, completion_tokens: 6, total_tokens: 15 },
+    quality_label: "good",
+    outcome: "success",
+  });
+  hooks.onSessionEnd(session, {
+    response: { status: "completed" },
+    quality_label: "good",
+    feedback_score: 4.5,
+    outcome: "success",
+  });
+}
+
+async function runGatewayFeature(baseOptions, feature) {
+  const hooks = createTokveraOpenAICompatibleGatewayHooks({
+    ...baseOptions,
+    feature,
+    emit_lifecycle_events: true,
+    capture_content: true,
+  });
+
+  const request = hooks.onRequestStart({
+    step_name: "gateway_request",
+    model: "router",
+    quality_label: "poor",
+    feedback_score: 2.5,
+    outcome: "success",
+  });
+  const downstream = hooks.onDownstreamStart(request, {
+    step_name: "downstream_provider_call",
+    provider: "openai",
+    model: "gpt-4o-mini",
+  });
+  hooks.onDownstreamEnd(downstream, {
+    response: { output_text: "ok" },
+    usage: { prompt_tokens: 7, completion_tokens: 3, total_tokens: 10 },
+    quality_label: "poor",
+    outcome: "success",
+  });
+  const fallback = hooks.onFallbackStart(request, {
+    step_name: "fallback_route",
+    fallback_reason: "rate_limit",
+    routing_reason: "budget_aware_escalation",
+    route: "anthropic:claude-3.5-haiku",
+    decision: {
+      fallback_reason: "rate_limit",
+      routing_reason: "budget_aware_escalation",
+      route: "anthropic:claude-3.5-haiku",
+      outcome: "success",
+    },
+  });
+  hooks.onFallbackEnd(fallback, {
+    response: { route: "anthropic:claude-3.5-haiku" },
+    quality_label: "poor",
+    feedback_score: 2.6,
+    outcome: "success",
+  });
+  hooks.onRequestEnd(request, {
+    response: { status: "completed" },
+    quality_label: "poor",
+    feedback_score: 2.7,
+    outcome: "success",
+  });
+}
+
 async function runOTelFeature(baseOptions, feature) {
   const exporter = new TokveraOTelSpanExporter({
     ...baseOptions,
@@ -300,6 +524,12 @@ async function main() {
     mistral: process.env.TOKVERA_FEATURE_MISTRAL_JS || "runtime_mistral_js",
     openaiAgents: process.env.TOKVERA_FEATURE_OPENAI_AGENTS_JS || "runtime_openai_agents_js",
     langgraph: process.env.TOKVERA_FEATURE_LANGGRAPH_JS || "runtime_langgraph_js",
+    autogen: process.env.TOKVERA_FEATURE_AUTOGEN_JS || "runtime_autogen_js",
+    mastra: process.env.TOKVERA_FEATURE_MASTRA_JS || "runtime_mastra_js",
+    temporal: process.env.TOKVERA_FEATURE_TEMPORAL_JS || "runtime_temporal_js",
+    pipecat: process.env.TOKVERA_FEATURE_PIPECAT_JS || "runtime_pipecat_js",
+    livekit: process.env.TOKVERA_FEATURE_LIVEKIT_JS || "runtime_livekit_js",
+    gateway: process.env.TOKVERA_FEATURE_GATEWAY_JS || "runtime_gateway_js",
     otel: process.env.TOKVERA_FEATURE_OTEL_JS || "runtime_otel_js",
   };
 
@@ -307,6 +537,12 @@ async function main() {
   await runMistralFeature(baseOptions, features.mistral);
   await runOpenAIAgentsFeature(baseOptions, features.openaiAgents);
   await runLangGraphFeature(baseOptions, features.langgraph);
+  await runAutoGenFeature(baseOptions, features.autogen);
+  await runMastraFeature(baseOptions, features.mastra);
+  await runTemporalFeature(baseOptions, features.temporal);
+  await runPipecatFeature(baseOptions, features.pipecat);
+  await runLiveKitFeature(baseOptions, features.livekit);
+  await runGatewayFeature(baseOptions, features.gateway);
   await runOTelFeature(baseOptions, features.otel);
 
   await new Promise((resolve) => setTimeout(resolve, Number(process.env.TOKVERA_WAIT_MS || 1200)));

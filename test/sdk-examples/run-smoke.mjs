@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 const nodeExampleDir = path.join(__dirname, "node-example");
 const pythonExamplePath = path.join(__dirname, "python-example", "example.py");
 const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime_helpers.py");
+const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8787);
@@ -27,6 +28,12 @@ const runtimeHelperFeatures = {
   nodeMistral: process.env.TOKVERA_FEATURE_MISTRAL_JS || "runtime_mistral_js",
   nodeOpenAIAgents: process.env.TOKVERA_FEATURE_OPENAI_AGENTS_JS || "runtime_openai_agents_js",
   nodeLangGraph: process.env.TOKVERA_FEATURE_LANGGRAPH_JS || "runtime_langgraph_js",
+  nodeAutoGen: process.env.TOKVERA_FEATURE_AUTOGEN_JS || "runtime_autogen_js",
+  nodeMastra: process.env.TOKVERA_FEATURE_MASTRA_JS || "runtime_mastra_js",
+  nodeTemporal: process.env.TOKVERA_FEATURE_TEMPORAL_JS || "runtime_temporal_js",
+  nodePipecat: process.env.TOKVERA_FEATURE_PIPECAT_JS || "runtime_pipecat_js",
+  nodeLiveKit: process.env.TOKVERA_FEATURE_LIVEKIT_JS || "runtime_livekit_js",
+  nodeGateway: process.env.TOKVERA_FEATURE_GATEWAY_JS || "runtime_gateway_js",
   nodeOTel: process.env.TOKVERA_FEATURE_OTEL_JS || "runtime_otel_js",
   pythonExistingApp: process.env.TOKVERA_FEATURE_EXISTING_APP_PY || "runtime_existing_app_py",
   pythonMistral: process.env.TOKVERA_FEATURE_MISTRAL_PY || "runtime_mistral_py",
@@ -36,6 +43,12 @@ const runtimeHelperFeatures = {
   pythonInstructor: process.env.TOKVERA_FEATURE_INSTRUCTOR_PY || "runtime_instructor_py",
   pythonPydanticAI: process.env.TOKVERA_FEATURE_PYDANTICAI_PY || "runtime_pydanticai_py",
   pythonCrewAI: process.env.TOKVERA_FEATURE_CREWAI_PY || "runtime_crewai_py",
+  pythonAutoGen: process.env.TOKVERA_FEATURE_AUTOGEN_PY || "runtime_autogen_py",
+  pythonMastra: process.env.TOKVERA_FEATURE_MASTRA_PY || "runtime_mastra_py",
+  pythonTemporal: process.env.TOKVERA_FEATURE_TEMPORAL_PY || "runtime_temporal_py",
+  pythonPipecat: process.env.TOKVERA_FEATURE_PIPECAT_PY || "runtime_pipecat_py",
+  pythonLiveKit: process.env.TOKVERA_FEATURE_LIVEKIT_PY || "runtime_livekit_py",
+  pythonGateway: process.env.TOKVERA_FEATURE_GATEWAY_PY || "runtime_gateway_py",
   pythonOTel: process.env.TOKVERA_FEATURE_OTEL_PY || "runtime_otel_py",
 };
 
@@ -78,12 +91,31 @@ function hasLocalPythonSdk() {
   return fs.existsSync(path.join(localPythonSdkDir, "tokvera", "__init__.py"));
 }
 
+function hasLocalNodeSdk() {
+  return fs.existsSync(path.join(localNodeSdkDir, "package.json"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
     ...baseEnv,
     PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
   };
+}
+
+async function installNodeExampleDependencies() {
+  console.log("[smoke] installing node example dependencies");
+  await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
+
+  if (!hasLocalNodeSdk()) return;
+
+  console.log(`[smoke] building local js sdk from ${localNodeSdkDir}`);
+  await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
+
+  console.log("[smoke] overriding node example with local js sdk checkout");
+  await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
+    cwd: nodeExampleDir,
+  });
 }
 
 async function waitForServer(url, maxAttempts = 20) {
@@ -132,8 +164,7 @@ async function main() {
     await waitForServer(`http://127.0.0.1:${mockPort}/health`);
     await fetch(statsUrl, { method: "DELETE" });
 
-    console.log("[smoke] installing node example dependencies");
-    await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
+    await installNodeExampleDependencies();
 
     console.log("[smoke] running node sdk example");
     await run(npmCommand, ["run", "example"], {
@@ -150,6 +181,12 @@ async function main() {
         TOKVERA_FEATURE_MISTRAL_JS: runtimeHelperFeatures.nodeMistral,
         TOKVERA_FEATURE_OPENAI_AGENTS_JS: runtimeHelperFeatures.nodeOpenAIAgents,
         TOKVERA_FEATURE_LANGGRAPH_JS: runtimeHelperFeatures.nodeLangGraph,
+        TOKVERA_FEATURE_AUTOGEN_JS: runtimeHelperFeatures.nodeAutoGen,
+        TOKVERA_FEATURE_MASTRA_JS: runtimeHelperFeatures.nodeMastra,
+        TOKVERA_FEATURE_TEMPORAL_JS: runtimeHelperFeatures.nodeTemporal,
+        TOKVERA_FEATURE_PIPECAT_JS: runtimeHelperFeatures.nodePipecat,
+        TOKVERA_FEATURE_LIVEKIT_JS: runtimeHelperFeatures.nodeLiveKit,
+        TOKVERA_FEATURE_GATEWAY_JS: runtimeHelperFeatures.nodeGateway,
         TOKVERA_FEATURE_OTEL_JS: runtimeHelperFeatures.nodeOTel,
       },
     });
@@ -184,6 +221,12 @@ async function main() {
         TOKVERA_FEATURE_INSTRUCTOR_PY: runtimeHelperFeatures.pythonInstructor,
         TOKVERA_FEATURE_PYDANTICAI_PY: runtimeHelperFeatures.pythonPydanticAI,
         TOKVERA_FEATURE_CREWAI_PY: runtimeHelperFeatures.pythonCrewAI,
+        TOKVERA_FEATURE_AUTOGEN_PY: runtimeHelperFeatures.pythonAutoGen,
+        TOKVERA_FEATURE_MASTRA_PY: runtimeHelperFeatures.pythonMastra,
+        TOKVERA_FEATURE_TEMPORAL_PY: runtimeHelperFeatures.pythonTemporal,
+        TOKVERA_FEATURE_PIPECAT_PY: runtimeHelperFeatures.pythonPipecat,
+        TOKVERA_FEATURE_LIVEKIT_PY: runtimeHelperFeatures.pythonLiveKit,
+        TOKVERA_FEATURE_GATEWAY_PY: runtimeHelperFeatures.pythonGateway,
         TOKVERA_FEATURE_OTEL_PY: runtimeHelperFeatures.pythonOTel,
       },
     });
@@ -217,7 +260,7 @@ async function main() {
       throw new Error(`missing expected provider coverage: ${missingProviders.join(", ")}`);
     }
 
-    if (Number(stats.statuses?.in_progress || 0) < 6) {
+    if (Number(stats.statuses?.in_progress || 0) < 12) {
       throw new Error(
         `expected multiple lifecycle start events, got statuses=${JSON.stringify(stats.statuses)}`
       );

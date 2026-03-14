@@ -8,18 +8,24 @@ from typing import Any
 try:
     from tokvera import (
         TokveraOTelSpanExporter,
+        create_autogen_tracer,
         configure_claude_agent_sdk,
         configure_google_adk,
         create_crewai_tracer,
         create_instructor_tracer,
         create_langgraph_tracer,
-    create_pydanticai_tracer,
-    create_tracer,
-    finish_span,
-    get_track_kwargs_from_trace_context,
-    start_span,
-    start_trace,
-    track_mistral,
+        create_livekit_tracer,
+        create_mastra_tracer,
+        create_openai_compatible_gateway_tracer,
+        create_pipecat_tracer,
+        create_pydanticai_tracer,
+        create_temporal_tracer,
+        create_tracer,
+        finish_span,
+        get_track_kwargs_from_trace_context,
+        start_span,
+        start_trace,
+        track_mistral,
     )
 except ImportError as exc:  # pragma: no cover - explicit operator guidance
     raise RuntimeError(
@@ -332,6 +338,183 @@ def run_crewai(base_options: dict[str, Any], feature: str) -> None:
     tracer.finish_run(crew, response={"status": "completed"}, quality_label="good", feedback_score=4.4, outcome="success")
 
 
+def run_autogen(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_autogen_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    conversation = tracer.start_conversation(
+        step_name="autogen_conversation",
+        model="multi-agent-router",
+        quality_label="poor",
+        feedback_score=2.8,
+        outcome="success",
+    )
+    agent = tracer.start_agent(
+        conversation,
+        step_name="planner_agent",
+        routing_reason="delegate_to_planner",
+        route="planner_agent",
+    )
+    tracer.finish_node(agent, response={"next": "search_docs"}, quality_label="poor", feedback_score=2.9, outcome="success")
+    tracer.finish_run(conversation, response={"status": "completed"}, quality_label="poor", feedback_score=2.9, outcome="success")
+
+
+def run_mastra(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_mastra_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    workflow = tracer.start_workflow(
+        step_name="mastra_workflow",
+        model="workflow-router",
+        quality_label="good",
+        feedback_score=4.3,
+        outcome="success",
+    )
+    step = tracer.start_step(workflow, step_name="search_docs")
+    tracer.finish_node(step, response={"matches": 4}, quality_label="good", outcome="success")
+    tracer.finish_run(workflow, response={"status": "completed"}, quality_label="good", feedback_score=4.5, outcome="success")
+
+
+def run_temporal(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_temporal_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    workflow = tracer.start_workflow(
+        step_name="temporal_workflow",
+        model="workflow-router",
+        quality_label="poor",
+        feedback_score=2.7,
+        outcome="success",
+    )
+    activity = tracer.start_activity(
+        workflow,
+        step_name="lookup_account",
+        tool_name="lookup_account",
+        retry_reason="timeout_retry",
+    )
+    tracer.finish_tool(activity, response={"account_status": "active"}, quality_label="poor", outcome="success")
+    tracer.finish_run(workflow, response={"status": "completed"}, quality_label="poor", feedback_score=2.9, outcome="success")
+
+
+def run_pipecat(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_pipecat_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    turn = tracer.start_turn(
+        step_name="voice_turn",
+        model="voice-router",
+        quality_label="good",
+        feedback_score=4.1,
+        outcome="success",
+    )
+    transcript = tracer.start_transcription(
+        turn,
+        step_name="speech_to_text",
+        provider="openai",
+        model="gpt-4o-mini-transcribe",
+    )
+    tracer.finish_model(
+        transcript,
+        response={"transcript": "Need account help"},
+        usage={"prompt_tokens": 8, "completion_tokens": 5, "total_tokens": 13},
+        quality_label="good",
+        outcome="success",
+    )
+    tracer.finish_run(turn, response={"status": "completed"}, quality_label="good", feedback_score=4.2, outcome="success")
+
+
+def run_livekit(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_livekit_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    session = tracer.start_session(
+        step_name="livekit_room_session",
+        model="voice-agent",
+        quality_label="good",
+        feedback_score=4.4,
+        outcome="success",
+    )
+    turn = tracer.start_turn(
+        session,
+        step_name="voice_turn",
+        provider="openai",
+        model="gpt-4o-realtime-preview",
+    )
+    tracer.finish_model(
+        turn,
+        response={"transcript": "Upgrade my plan"},
+        usage={"prompt_tokens": 9, "completion_tokens": 6, "total_tokens": 15},
+        quality_label="good",
+        outcome="success",
+    )
+    tracer.finish_run(session, response={"status": "completed"}, quality_label="good", feedback_score=4.5, outcome="success")
+
+
+def run_gateway(base_options: dict[str, Any], feature: str) -> None:
+    tracer = create_openai_compatible_gateway_tracer(
+        **base_options,
+        feature=feature,
+        emit_lifecycle_events=True,
+        capture_content=True,
+    )
+    request = tracer.start_request(
+        step_name="gateway_request",
+        model="router",
+        quality_label="poor",
+        feedback_score=2.5,
+        outcome="success",
+    )
+    downstream = tracer.start_downstream(
+        request,
+        step_name="downstream_provider_call",
+        provider="openai",
+        model="gpt-4o-mini",
+    )
+    tracer.finish_model(
+        downstream,
+        response={"output_text": "ok"},
+        usage={"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10},
+        quality_label="poor",
+        outcome="success",
+    )
+    fallback = tracer.start_fallback(
+        request,
+        step_name="fallback_route",
+        fallback_reason="rate_limit",
+        routing_reason="budget_aware_escalation",
+        route="anthropic:claude-3.5-haiku",
+        decision={
+            "fallback_reason": "rate_limit",
+            "routing_reason": "budget_aware_escalation",
+            "route": "anthropic:claude-3.5-haiku",
+            "outcome": "success",
+        },
+    )
+    tracer.finish_branch(
+        fallback,
+        response={"route": "anthropic:claude-3.5-haiku"},
+        quality_label="poor",
+        feedback_score=2.6,
+        outcome="success",
+    )
+    tracer.finish_run(request, response={"status": "completed"}, quality_label="poor", feedback_score=2.7, outcome="success")
+
+
 def run_otel(base_options: dict[str, Any], feature: str) -> None:
     exporter = TokveraOTelSpanExporter(
         **base_options,
@@ -393,6 +576,12 @@ def main() -> None:
         "instructor": os.getenv("TOKVERA_FEATURE_INSTRUCTOR_PY", "runtime_instructor_py"),
         "pydanticai": os.getenv("TOKVERA_FEATURE_PYDANTICAI_PY", "runtime_pydanticai_py"),
         "crewai": os.getenv("TOKVERA_FEATURE_CREWAI_PY", "runtime_crewai_py"),
+        "autogen": os.getenv("TOKVERA_FEATURE_AUTOGEN_PY", "runtime_autogen_py"),
+        "mastra": os.getenv("TOKVERA_FEATURE_MASTRA_PY", "runtime_mastra_py"),
+        "temporal": os.getenv("TOKVERA_FEATURE_TEMPORAL_PY", "runtime_temporal_py"),
+        "pipecat": os.getenv("TOKVERA_FEATURE_PIPECAT_PY", "runtime_pipecat_py"),
+        "livekit": os.getenv("TOKVERA_FEATURE_LIVEKIT_PY", "runtime_livekit_py"),
+        "gateway": os.getenv("TOKVERA_FEATURE_GATEWAY_PY", "runtime_gateway_py"),
         "otel": os.getenv("TOKVERA_FEATURE_OTEL_PY", "runtime_otel_py"),
     }
 
@@ -404,6 +593,12 @@ def main() -> None:
     run_instructor(base_options, features["instructor"])
     run_pydanticai(base_options, features["pydanticai"])
     run_crewai(base_options, features["crewai"])
+    run_autogen(base_options, features["autogen"])
+    run_mastra(base_options, features["mastra"])
+    run_temporal(base_options, features["temporal"])
+    run_pipecat(base_options, features["pipecat"])
+    run_livekit(base_options, features["livekit"])
+    run_gateway(base_options, features["gateway"])
     run_otel(base_options, features["otel"])
 
     time.sleep(float(os.getenv("TOKVERA_WAIT_SECONDS", "4.0")))
