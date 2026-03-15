@@ -11,6 +11,7 @@ const nodeExampleDir = path.join(__dirname, "node-example");
 const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime_helpers.py");
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
+const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const baseUrl = (process.env.TOKVERA_API_BASE_URL || "https://api.tokvera.org").replace(/\/$/, "");
@@ -61,8 +62,22 @@ const pythonFeatures = {
   otel: `vis_otel_py_${now}`,
 };
 
-const allFeatures = [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
-const liveFeatures = allFeatures.filter((feature) => !feature.includes("otel"));
+const goFeatures = {
+  existingApp: `vis_existing_app_go_${now}`,
+  providers: `vis_provider_wrappers_go_${now}`,
+  otel: `vis_otel_go_${now}`,
+};
+
+function getAllFeatures(goEnabled) {
+  return goEnabled
+    ? [...Object.values(nodeFeatures), ...Object.values(pythonFeatures), ...Object.values(goFeatures)]
+    : [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
+}
+
+function getLiveFeatures(goEnabled) {
+  return getAllFeatures(goEnabled).filter((feature) => !feature.includes("otel"));
+}
+
 const actionCenterFeatures = [
   nodeFeatures.autogen,
   nodeFeatures.temporal,
@@ -134,6 +149,10 @@ function hasLocalNodeSdk() {
   return fs.existsSync(path.join(localNodeSdkDir, "package.json"));
 }
 
+function hasLocalGoSdk() {
+  return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
@@ -152,9 +171,34 @@ async function installNodeExampleDependencies() {
   await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
 
   console.log("[runtime-visibility] overriding node example with local js sdk checkout");
+  fs.rmSync(path.join(nodeExampleDir, "node_modules", "@tokvera", "sdk"), {
+    recursive: true,
+    force: true,
+  });
   await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
     cwd: nodeExampleDir,
   });
+}
+
+async function resolveGoCommand() {
+  const portableName = process.platform === "win32" ? "go.exe" : "go";
+  const candidates = [
+    process.env.TOKVERA_GO_BIN,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126b", "go", "bin", portableName),
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126", "go", "bin", portableName),
+    "go",
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  return null;
 }
 
 async function resolvePythonCommand() {
@@ -215,7 +259,7 @@ async function fetchActionCenter() {
   );
 }
 
-async function emitRuntimeHelpers() {
+async function emitRuntimeHelpers(go) {
   const sharedEnv = {
     ...process.env,
     TOKVERA_API_KEY: apiKey,
@@ -279,6 +323,43 @@ async function emitRuntimeHelpers() {
     cwd: __dirname,
     env: pythonEnv,
   });
+
+  if (hasLocalGoSdk() && go) {
+    console.log("[runtime-visibility] emitting go manual tracer traces");
+    await run(go, ["run", "./examples/manual_tracer"], {
+      cwd: localGoSdkDir,
+      env: {
+        ...sharedEnv,
+        TOKVERA_FEATURE: goFeatures.existingApp,
+        TOKVERA_TENANT_ID: "tenant_demo_go",
+        TOKVERA_ENVIRONMENT: "prod",
+      },
+    });
+
+    console.log("[runtime-visibility] emitting go provider wrapper traces");
+    await run(go, ["run", "./examples/provider_wrappers"], {
+      cwd: localGoSdkDir,
+      env: {
+        ...sharedEnv,
+        TOKVERA_FEATURE: goFeatures.providers,
+        TOKVERA_TENANT_ID: "tenant_demo_go",
+        TOKVERA_ENVIRONMENT: "prod",
+      },
+    });
+
+    console.log("[runtime-visibility] emitting go otel bridge traces");
+    await run(go, ["run", "./examples/otel_bridge"], {
+      cwd: localGoSdkDir,
+      env: {
+        ...sharedEnv,
+        TOKVERA_FEATURE: goFeatures.otel,
+        TOKVERA_TENANT_ID: "tenant_demo_go",
+        TOKVERA_ENVIRONMENT: "prod",
+      },
+    });
+  } else {
+    console.log("[runtime-visibility] skipping go traces (tokvera-go repo or go toolchain unavailable)");
+  }
 }
 
 function getFeatureCounts(breakdown) {
@@ -291,7 +372,9 @@ function getFeatureCounts(breakdown) {
   }, {});
 }
 
-async function waitForVisibility(beforeOverviewRequests) {
+async function waitForVisibility(beforeOverviewRequests, goEnabled) {
+  const allFeatures = getAllFeatures(goEnabled);
+  const liveFeatures = getLiveFeatures(goEnabled);
   const started = Date.now();
   let lastState = null;
 
@@ -383,10 +466,13 @@ async function main() {
   );
   console.log(`[runtime-visibility] overview before=${beforeOverviewRequests}`);
 
-  await emitRuntimeHelpers();
+  const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
+  const goEnabled = Boolean(go && hasLocalGoSdk());
+
+  await emitRuntimeHelpers(go);
 
   console.log("[runtime-visibility] waiting for dashboard visibility across overview, traces, live, detail, inspector, and action center");
-  const state = await waitForVisibility(beforeOverviewRequests);
+  const state = await waitForVisibility(beforeOverviewRequests, goEnabled);
 
   console.log("[runtime-visibility] success");
   console.log(

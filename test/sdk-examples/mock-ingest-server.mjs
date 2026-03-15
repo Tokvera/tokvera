@@ -7,6 +7,10 @@ function toNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 }
 
+function getField(event, topLevelKey, nestedTagKey = topLevelKey) {
+  return toNonEmptyString(event?.[topLevelKey]) || toNonEmptyString(event?.tags?.[nestedTagKey]);
+}
+
 function summarizeCounts(items, selector) {
   return items.reduce((acc, item) => {
     const value = selector(item);
@@ -29,8 +33,8 @@ function uniqueValues(items, selector) {
 function buildStats() {
   const lifecycleKeys = new Map();
   for (const event of events) {
-    const traceId = toNonEmptyString(event?.tags?.trace_id);
-    const spanId = toNonEmptyString(event?.tags?.span_id);
+    const traceId = getField(event, "trace_id");
+    const spanId = getField(event, "span_id");
     const status = toNonEmptyString(event?.status);
     if (!traceId || !spanId || !status) continue;
     const key = `${traceId}:${spanId}`;
@@ -67,13 +71,13 @@ function buildStats() {
     ok: true,
     count: events.length,
     endpoints: events.map((item) => item.endpoint),
-    features: summarizeCounts(events, (item) => toNonEmptyString(item?.tags?.feature)),
+    features: summarizeCounts(events, (item) => getField(item, "feature")),
     providers: summarizeCounts(events, (item) => toNonEmptyString(item?.provider)),
     statuses: summarizeCounts(events, (item) => toNonEmptyString(item?.status)),
     event_types: summarizeCounts(events, (item) => toNonEmptyString(item?.event_type)),
-    step_names: summarizeCounts(events, (item) => toNonEmptyString(item?.tags?.step_name)),
-    trace_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.trace_id)),
-    run_ids: uniqueValues(events, (item) => toNonEmptyString(item?.tags?.run_id)),
+    step_names: summarizeCounts(events, (item) => getField(item, "step_name")),
+    trace_ids: uniqueValues(events, (item) => getField(item, "trace_id")),
+    run_ids: uniqueValues(events, (item) => getField(item, "run_id")),
     lifecycle: lifecycleSummary,
   };
 }

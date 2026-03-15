@@ -1,6 +1,6 @@
 # Tokvera Execution TODO (Mar 11, 2026 -> Mar 31, 2027)
 
-Last updated: 2026-03-14
+Last updated: 2026-03-15
 Owner: product + engineering
 Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
@@ -161,8 +161,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done
 
 ### SDK Expansion Before Gateway
-- [ ] Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility
-  - Current state: CI-first scaffold is allowed, but this stays open until Go CI, canonical contract checks, lifecycle/live traces visibility, and dashboard visibility all pass
+- [x] Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility
+  - Go CI, canonical contract checks, local smoke/soak, production lifecycle visibility, and dashboard visibility now pass
 - [ ] Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable
 - [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass

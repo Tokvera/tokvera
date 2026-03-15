@@ -11,6 +11,7 @@ const nodeExampleDir = path.join(__dirname, "node-example");
 const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime_helpers.py");
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
+const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8788);
 const ingestUrl = `http://127.0.0.1:${mockPort}/v1/events`;
@@ -83,6 +84,10 @@ function hasLocalNodeSdk() {
   return fs.existsSync(path.join(localNodeSdkDir, "package.json"));
 }
 
+function hasLocalGoSdk() {
+  return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
@@ -113,9 +118,34 @@ async function installNodeExampleDependencies() {
   await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
   if (!hasLocalNodeSdk()) return;
   await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
+  fs.rmSync(path.join(nodeExampleDir, "node_modules", "@tokvera", "sdk"), {
+    recursive: true,
+    force: true,
+  });
   await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
     cwd: nodeExampleDir,
   });
+}
+
+async function resolveGoCommand() {
+  const portableName = process.platform === "win32" ? "go.exe" : "go";
+  const candidates = [
+    process.env.TOKVERA_GO_BIN,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126b", "go", "bin", portableName),
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126", "go", "bin", portableName),
+    "go",
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  return null;
 }
 
 function buildFeatureEnv(round) {
@@ -146,7 +176,20 @@ function buildFeatureEnv(round) {
     TOKVERA_FEATURE_LIVEKIT_PY: `soak_livekit_py_${round}`,
     TOKVERA_FEATURE_GATEWAY_PY: `soak_gateway_py_${round}`,
     TOKVERA_FEATURE_OTEL_PY: `soak_otel_py_${round}`,
+    TOKVERA_FEATURE_EXISTING_APP_GO: `soak_existing_app_go_${round}`,
+    TOKVERA_FEATURE_PROVIDERS_GO: `soak_provider_wrappers_go_${round}`,
+    TOKVERA_FEATURE_OTEL_GO: `soak_otel_go_${round}`,
   };
+}
+
+function eventField(event, topLevelKey, nestedTagKey = topLevelKey) {
+  if (typeof event?.[topLevelKey] === "string" && event[topLevelKey].trim().length > 0) {
+    return event[topLevelKey].trim();
+  }
+  if (typeof event?.tags?.[nestedTagKey] === "string" && event.tags[nestedTagKey].trim().length > 0) {
+    return event.tags[nestedTagKey].trim();
+  }
+  return null;
 }
 
 async function fetchJson(url) {
@@ -163,8 +206,8 @@ function analyzeEvents(items) {
   const statusBySpan = new Map();
 
   for (const event of items) {
-    const traceId = event?.tags?.trace_id;
-    const spanId = event?.tags?.span_id;
+    const traceId = eventField(event, "trace_id");
+    const spanId = eventField(event, "span_id");
     const status = event?.status;
     if (!traceId || !spanId || !status) continue;
 
@@ -224,6 +267,8 @@ async function main() {
 
     const python = await resolvePythonCommand();
     const pythonEnvBase = buildPythonEnv(sharedEnv);
+    const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
+    const goEnabled = Boolean(go && hasLocalGoSdk());
 
     for (let round = 1; round <= soakRounds; round += 1) {
       const featureEnv = buildFeatureEnv(round);
@@ -244,6 +289,41 @@ async function main() {
           ...featureEnv,
         },
       });
+
+      if (goEnabled) {
+        console.log(`[soak] round ${round}/${soakRounds}: go manual tracer`);
+        await run(go, ["run", "./examples/manual_tracer"], {
+          cwd: localGoSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_EXISTING_APP_GO,
+            TOKVERA_TENANT_ID: "tenant_demo_go",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: go provider wrappers`);
+        await run(go, ["run", "./examples/provider_wrappers"], {
+          cwd: localGoSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_PROVIDERS_GO,
+            TOKVERA_TENANT_ID: "tenant_demo_go",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: go otel bridge`);
+        await run(go, ["run", "./examples/otel_bridge"], {
+          cwd: localGoSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_GO,
+            TOKVERA_TENANT_ID: "tenant_demo_go",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+      }
     }
 
     await sleep(1500);

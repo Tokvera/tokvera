@@ -12,6 +12,7 @@ const pythonExamplePath = path.join(__dirname, "python-example", "example.py");
 const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime_helpers.py");
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
+const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8787);
 const ingestUrl = `http://127.0.0.1:${mockPort}/v1/events`;
@@ -50,6 +51,9 @@ const runtimeHelperFeatures = {
   pythonLiveKit: process.env.TOKVERA_FEATURE_LIVEKIT_PY || "runtime_livekit_py",
   pythonGateway: process.env.TOKVERA_FEATURE_GATEWAY_PY || "runtime_gateway_py",
   pythonOTel: process.env.TOKVERA_FEATURE_OTEL_PY || "runtime_otel_py",
+  goExistingApp: process.env.TOKVERA_FEATURE_EXISTING_APP_GO || "runtime_existing_app_go",
+  goProviders: process.env.TOKVERA_FEATURE_PROVIDERS_GO || "runtime_provider_wrappers_go",
+  goOTel: process.env.TOKVERA_FEATURE_OTEL_GO || "runtime_otel_go",
 };
 
 function run(command, args, options = {}) {
@@ -95,6 +99,10 @@ function hasLocalNodeSdk() {
   return fs.existsSync(path.join(localNodeSdkDir, "package.json"));
 }
 
+function hasLocalGoSdk() {
+  return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
@@ -113,9 +121,34 @@ async function installNodeExampleDependencies() {
   await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
 
   console.log("[smoke] overriding node example with local js sdk checkout");
+  fs.rmSync(path.join(nodeExampleDir, "node_modules", "@tokvera", "sdk"), {
+    recursive: true,
+    force: true,
+  });
   await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
     cwd: nodeExampleDir,
   });
+}
+
+async function resolveGoCommand() {
+  const portableName = process.platform === "win32" ? "go.exe" : "go";
+  const candidates = [
+    process.env.TOKVERA_GO_BIN,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126b", "go", "bin", portableName),
+    path.resolve(__dirname, "..", "..", "..", ".tools", "go126", "go", "bin", portableName),
+    "go",
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  return null;
 }
 
 async function waitForServer(url, maxAttempts = 20) {
@@ -231,6 +264,45 @@ async function main() {
       },
     });
 
+    const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
+    const goEnabled = Boolean(go && hasLocalGoSdk());
+    if (goEnabled) {
+      console.log("[smoke] running go manual tracer example");
+      await run(go, ["run", "./examples/manual_tracer"], {
+        cwd: localGoSdkDir,
+        env: {
+          ...sharedEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.goExistingApp,
+          TOKVERA_TENANT_ID: "tenant_demo_go",
+          TOKVERA_ENVIRONMENT: "dev",
+        },
+      });
+
+      console.log("[smoke] running go provider wrappers example");
+      await run(go, ["run", "./examples/provider_wrappers"], {
+        cwd: localGoSdkDir,
+        env: {
+          ...sharedEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.goProviders,
+          TOKVERA_TENANT_ID: "tenant_demo_go",
+          TOKVERA_ENVIRONMENT: "dev",
+        },
+      });
+
+      console.log("[smoke] running go otel bridge example");
+      await run(go, ["run", "./examples/otel_bridge"], {
+        cwd: localGoSdkDir,
+        env: {
+          ...sharedEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.goOTel,
+          TOKVERA_TENANT_ID: "tenant_demo_go",
+          TOKVERA_ENVIRONMENT: "dev",
+        },
+      });
+    } else {
+      console.log("[smoke] skipping go examples (tokvera-go repo or go toolchain unavailable)");
+    }
+
     // Allow final async sends to complete.
     await sleep(1000);
     const statsResponse = await fetch(statsUrl);
@@ -246,11 +318,20 @@ async function main() {
       "sdk_smoke_python",
       ...Object.values(runtimeHelperFeatures),
     ];
+    const goFeatures = [
+      runtimeHelperFeatures.goExistingApp,
+      runtimeHelperFeatures.goProviders,
+      runtimeHelperFeatures.goOTel,
+    ];
+    const shouldExpectGo = goEnabled;
     const missingFeatures = expectedFeatures.filter(
       (feature) => Number(stats.features?.[feature] || 0) < 1
     );
-    if (missingFeatures.length) {
-      throw new Error(`missing expected feature coverage: ${missingFeatures.join(", ")}`);
+    const relevantMissingFeatures = shouldExpectGo
+      ? missingFeatures
+      : missingFeatures.filter((feature) => !goFeatures.includes(feature));
+    if (relevantMissingFeatures.length) {
+      throw new Error(`missing expected feature coverage: ${relevantMissingFeatures.join(", ")}`);
     }
 
     const missingProviders = ["openai", "mistral", "tokvera"].filter(

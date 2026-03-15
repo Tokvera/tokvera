@@ -1,0 +1,119 @@
+{
+  "id": "2026-03-15-go-sdk-wave1",
+  "title": "Qualify tokvera-go as the Wave 1 SDK",
+  "date": "2026-03-15",
+  "summary": "Closes the Go Wave 1 checklist item after CI, canonical contract checks, local smoke and soak, production lifecycle visibility, dashboard visibility, docs, and examples all pass.",
+  "completed_todo_items": [
+    "Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-go",
+        "paths": [
+          "tracer.go",
+          "providers.go",
+          "otel_bridge.go",
+          "types.go",
+          "examples/manual_tracer/main.go",
+          "examples/provider_wrappers/main.go",
+          "examples/otel_bridge/main.go",
+          "examples/internal/exampleenv/config.go"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/sdk-examples/run-smoke.mjs",
+          "test/sdk-examples/run-runtime-helper-visibility.mjs",
+          "test/sdk-examples/run-integration-soak.mjs",
+          "test/sdk-examples/mock-ingest-server.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/go-sdk/page.tsx",
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "app/docs/starter-templates/page.tsx",
+          "lib/docs-content.ts",
+          "lib/integration-snippets.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-go",
+        "commands": [
+          "gofmt -w .",
+          "go vet ./...",
+          "go test ./...",
+          "node scripts/check-canonical-contract.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "ROADMAP.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/go-sdk/page.tsx",
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "app/docs/starter-templates/page.tsx",
+          "lib/docs-content.ts"
+        ]
+      },
+      {
+        "repo": "tokvera-go",
+        "paths": [
+          "README.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-go",
+        "paths": [
+          "examples/manual_tracer",
+          "examples/provider_wrappers",
+          "examples/otel_bridge"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sdk-examples/run-smoke.mjs",
+          "node test/sdk-examples/run-integration-soak.mjs",
+          "node test/sdk-examples/run-runtime-helper-visibility.mjs"
+        ],
+        "notes": "Confirms Go telemetry survives local smoke, lifecycle soak, and production visibility checks across overview, traces, live traces, and trace detail."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the Go SDK qualification docs, TODO completion, release evidence manifest, and the Go additions to the shared smoke and visibility runners if any post-release regression is found."
+  }
+}
