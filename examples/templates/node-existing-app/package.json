@@ -1,11 +1,10 @@
 {
-  "name": "tokvera-node-example",
+  "name": "tokvera-template-node-existing-app",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "example": "node index.mjs",
-    "example:integrations": "node integrations.mjs"
+    "start": "node app.mjs"
   },
   "dependencies": {
     "@tokvera/sdk": "^0.2.9"

@@ -1,0 +1,100 @@
+{
+  "id": "2026-03-15-starter-templates-acquisition",
+  "title": "Add starter templates and live-trace verification checklists",
+  "date": "2026-03-15",
+  "summary": "Adds public starter templates, a shared verify-in-live-traces checklist, docs discovery, and coverage for acquisition-oriented first-run starter packs.",
+  "completed_todo_items": [
+    "Add sample apps, template repos, and \"verify in live traces\" checklists for acquisition"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/templates/README.md",
+          "examples/templates/checklists/verify-in-live-traces.md",
+          "examples/templates/node-existing-app/app.mjs",
+          "examples/templates/python-existing-app/app.py",
+          "examples/templates/node-multi-model-router/router.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/starter-templates/page.tsx",
+          "lib/starter-templates.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node --check examples/templates/node-existing-app/app.mjs",
+          "node --check examples/templates/node-multi-model-router/router.mjs",
+          "python -m py_compile examples/templates/python-existing-app/app.py"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npm run build",
+          "npm run docs:check",
+          "npm run dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "examples/README.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "app/docs/quickstart/page.tsx",
+          "lib/docs-content.ts"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/templates/node-existing-app",
+          "examples/templates/python-existing-app",
+          "examples/templates/node-multi-model-router"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sdk-examples/run-smoke.mjs"
+        ],
+        "notes": "Confirms the example ecosystem still emits valid telemetry after version and starter-pack changes."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Verifies the starter template acquisition surface remains discoverable in docs."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the starter template directories, docs links, Playwright additions, and checklist completion if the acquisition surface or example compatibility regresses."
+  }
+}

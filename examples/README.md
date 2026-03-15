@@ -7,6 +7,25 @@ This folder contains simple, runnable examples for both published SDKs:
 
 Each example uses fake provider-shaped clients/callback payloads so you can validate Tokvera event emission without provider credentials.
 
+## Starter Templates
+
+For acquisition-focused starter packs, use `examples/templates/`:
+
+- `examples/templates/node-existing-app`
+- `examples/templates/python-existing-app`
+- `examples/templates/node-multi-model-router`
+
+Each starter includes:
+
+- copyable app scaffold
+- local env template
+- minimal tracing code
+- a `verify in live traces` checklist
+
+Shared checklist:
+
+- `examples/templates/checklists/verify-in-live-traces.md`
+
 ## Prerequisites
 
 - A Tokvera project API key

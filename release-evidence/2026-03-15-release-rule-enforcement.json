@@ -1,0 +1,61 @@
+{
+  "id": "2026-03-15-release-rule-enforcement",
+  "title": "Enforce release checklist rule in tooling",
+  "date": "2026-03-15",
+  "summary": "Adds automated release evidence validation in the coordination repo so completed execution items require proof for code, tests, docs, examples, and smoke validation.",
+  "completed_todo_items": [
+    "Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          ".github/workflows/release-evidence.yml",
+          "test/check-release-evidence.mjs"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node --test test/check-release-evidence.test.mjs"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "CONTRIBUTING.md",
+          "EXECUTION_TODO.md",
+          "release-evidence/README.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-03-15-release-rule-enforcement.json"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD~1 --head HEAD"
+        ],
+        "notes": "Validator run against the checklist-completing change."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the release evidence workflow, validator script, tests, manifest, and EXECUTION_TODO checklist update if the gate blocks legitimate changes."
+  }
+}

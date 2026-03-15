@@ -31,6 +31,7 @@ This repository is the public coordination and documentation entry point for the
 
 - `examples/node`
 - `examples/python`
+- `examples/templates` (copy-ready starter packs + live-trace checklists)
 - `test/sdk-examples` (smoke and production-gate helpers)
 - `test/generate-activation-report.mjs` (weekly paid-tenant and activation gate report)
 
@@ -38,10 +39,19 @@ These include trace context, evaluation signals, and framework integration patte
 They also now demonstrate lifecycle-enabled live tracing so runs can appear immediately in
 `/dashboard/traces/live` while calls are still in progress.
 
+Starter templates currently include:
+
+- Node existing app starter
+- Python existing app starter
+- Node multi-model router starter
+
+Each starter links to a shared `verify in live traces` checklist before rollout.
+
 ## Strategy Docs
 
 - Product roadmap: `ROADMAP.md`
 - 12-month execution checklist: `EXECUTION_TODO.md`
+- Release evidence manifests: `release-evidence/`
 
 ## Product Links
 
@@ -72,4 +82,27 @@ node test/generate-activation-report.mjs
 ```
 
 This writes JSON and Markdown artifacts under `test/artifacts/` and tracks the current
-`active_paid_tenants_30d` gate before any gateway work starts.
+pre-gateway funnel:
+- `active_paid_tenants_30d`
+- tenants with first event
+- tenants that opened live traces with real rows
+- tenants that reached a real trace-debugging session
+
+## Release Rule Enforcement
+
+Checklist items in `EXECUTION_TODO.md` are only considered done when the change set includes
+release evidence for:
+
+- code
+- tests
+- docs
+- example
+- smoke or visibility validation
+
+The coordination repo enforces that with:
+
+- `test/check-release-evidence.mjs`
+- `test/check-release-evidence.test.mjs`
+- `.github/workflows/release-evidence.yml`
+
+Use `release-evidence/YYYY-MM-DD-short-slug.json` to record the proof for each completed item.

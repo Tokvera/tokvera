@@ -1,0 +1,48 @@
+name: release-evidence
+
+on:
+  pull_request:
+    paths:
+      - "EXECUTION_TODO.md"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "release-evidence/**"
+      - "test/check-release-evidence.mjs"
+      - "test/check-release-evidence.test.mjs"
+      - ".github/workflows/release-evidence.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "EXECUTION_TODO.md"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "release-evidence/**"
+      - "test/check-release-evidence.mjs"
+      - "test/check-release-evidence.test.mjs"
+      - ".github/workflows/release-evidence.yml"
+
+jobs:
+  release-evidence:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test validator
+        run: node --test test/check-release-evidence.test.mjs
+
+      - name: Validate release evidence
+        env:
+          RELEASE_EVIDENCE_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          RELEASE_EVIDENCE_HEAD: ${{ github.sha }}
+        run: node test/check-release-evidence.mjs

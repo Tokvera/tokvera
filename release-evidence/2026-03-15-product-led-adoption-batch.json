@@ -1,0 +1,142 @@
+{
+  "id": "2026-03-15-product-led-adoption-batch",
+  "title": "Qualify the product-led adoption surfaces completed before gateway",
+  "date": "2026-03-15",
+  "summary": "Records release evidence for the guided onboarding, empty-state standardization, beginner guidance, shared integration chooser, comparison content, compatibility gate, and activation review changes already implemented across dashboard, API, and coordination surfaces.",
+  "completed_todo_items": [
+    "Standardize empty states across Overview, Traces, Live Traces, Trace Detail, API Keys, and Billing",
+    "Add persistent beginner guidance on core dashboard pages",
+    "Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup",
+    "Add guided setup variants for existing app, multi-model, provider-wrapper-first, framework, and agent-runtime teams",
+    "Maintain canonical docs tracks for quickstart, existing app/manual tracing, multi-model tracing, live tracing, trace debugging, billing/ops, and integration matrix",
+    "Add comparison and acquisition pages for Tokvera vs LangSmith, Tokvera vs generic dashboards, and SaaS app teams",
+    "Keep marketing, docs, and dashboard setup content on one shared integration/content model",
+    "Keep public smoke/soak suite current with local smoke, production smoke, runtime visibility, integration soak, duplicate-emission detection, and lifecycle completeness",
+    "Add official integration compatibility matrix gate for overview, traces, live traces, trace detail/inspector, and Action Center visibility",
+    "Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/dashboard-empty-state.tsx",
+          "components/integrations/integration-path-grid.tsx",
+          "lib/integration-paths.ts",
+          "lib/dashboard-activation.ts",
+          "app/dashboard/onboarding/page.tsx",
+          "app/dashboard/traces/page.tsx",
+          "app/dashboard/traces/live/page.tsx",
+          "app/dashboard/traces/[traceId]/page.tsx",
+          "app/dashboard/api-keys/page.tsx",
+          "app/dashboard/billing/page.tsx",
+          "app/(marketing)/compare/langsmith/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards/page.tsx",
+          "app/(marketing)/for-saas-ai-teams/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/app.js",
+          "tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/generate-activation-report.mjs",
+          "EXECUTION_TODO.md",
+          "README.md"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npm run build",
+          "npm run docs:check",
+          "npm run dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts",
+          "npx playwright test tests/e2e/onboarding-flow.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/live-tracing/page.tsx",
+          "app/docs/multi-model-tracing/page.tsx",
+          "app/docs/trace-debugging-workflow/page.tsx",
+          "app/docs/production-operations/page.tsx",
+          "app/docs/quickstart/page.tsx",
+          "lib/docs-content.ts",
+          "lib/blog-content.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "ROADMAP.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "README.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/get-started/page.tsx",
+          "app/docs/quickstart/page.tsx",
+          "app/dashboard/onboarding/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/generate-activation-report.mjs"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npm run build",
+          "npm run docs:check",
+          "npm run dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts",
+          "npx playwright test tests/e2e/onboarding-flow.spec.ts"
+        ],
+        "notes": "Confirms the growth, docs, and first-run surfaces compile and behave on the product path."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/generate-activation-report.mjs"
+        ],
+        "notes": "Activation review report remains the weekly operational gate for the pre-gateway funnel."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the dashboard/API/docs/reporting changes and corresponding EXECUTION_TODO checklist updates if the onboarding or activation funnel surfaces regress."
+  }
+}

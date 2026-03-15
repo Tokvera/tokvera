@@ -20,12 +20,14 @@ Feature requests should define:
 - Follow existing style and naming conventions
 - Prefer clear, maintainable implementations over clever abstractions
 - Update documentation for behavior or interface changes
+- If you mark an item complete in `EXECUTION_TODO.md`, add a matching manifest under `release-evidence/`
 
 ## Testing Expectations
 
 - Add or update tests for all behavior changes
 - Ensure existing tests continue to pass
 - Include edge-case coverage where applicable
+- Validate release evidence with `node test/check-release-evidence.mjs --base ... --head ...` when closing execution items
 
 ## Commit Style Guidance
 

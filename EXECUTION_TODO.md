@@ -143,22 +143,22 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
 ### Product Usability and Conversion
 - [x] Rework signup -> project -> API key -> first event -> live trace into one guided first-run path
-- [ ] Standardize empty states across Overview, Traces, Live Traces, Trace Detail, API Keys, and Billing
-- [ ] Add persistent beginner guidance on core dashboard pages
-- [ ] Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup
-- [ ] Add guided setup variants for existing app, multi-model, provider-wrapper-first, framework, and agent-runtime teams
+- [x] Standardize empty states across Overview, Traces, Live Traces, Trace Detail, API Keys, and Billing
+- [x] Add persistent beginner guidance on core dashboard pages
+- [x] Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup
+- [x] Add guided setup variants for existing app, multi-model, provider-wrapper-first, framework, and agent-runtime teams
 
 ### Documentation and Acquisition Content
-- [ ] Maintain canonical docs tracks for quickstart, existing app/manual tracing, multi-model tracing, live tracing, trace debugging, billing/ops, and integration matrix
+- [x] Maintain canonical docs tracks for quickstart, existing app/manual tracing, multi-model tracing, live tracing, trace debugging, billing/ops, and integration matrix
 - [ ] Ship 2 practical blog posts every sprint
-- [ ] Add comparison and acquisition pages for Tokvera vs LangSmith, Tokvera vs generic dashboards, and SaaS app teams
-- [ ] Keep marketing, docs, and dashboard setup content on one shared integration/content model
+- [x] Add comparison and acquisition pages for Tokvera vs LangSmith, Tokvera vs generic dashboards, and SaaS app teams
+- [x] Keep marketing, docs, and dashboard setup content on one shared integration/content model
 
 ### E2E, Smoke, and Release Gates
 - [x] Add product-path Playwright coverage for onboarding, traces/live traces, trace detail, API key setup, and docs/integration navigation
-- [ ] Keep public smoke/soak suite current with local smoke, production smoke, runtime visibility, integration soak, duplicate-emission detection, and lifecycle completeness
-- [ ] Add official integration compatibility matrix gate for overview, traces, live traces, trace detail/inspector, and Action Center visibility
-- [ ] Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done
+- [x] Keep public smoke/soak suite current with local smoke, production smoke, runtime visibility, integration soak, duplicate-emission detection, and lifecycle completeness
+- [x] Add official integration compatibility matrix gate for overview, traces, live traces, trace detail/inspector, and Action Center visibility
+- [x] Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done
 
 ### SDK Expansion Before Gateway
 - [ ] Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility
@@ -167,8 +167,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
 
 ### Commercial Readiness
-- [ ] Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics
-- [ ] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
+- [x] Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics
+- [x] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
 - [ ] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
 - [x] Generate automated report for 20 active paid tenants gate
 
@@ -203,6 +203,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
 ## Release Checklist Template (use each 2-week cycle)
 
+- [ ] Release evidence manifest added under `release-evidence/`
 - [ ] API contract added/updated
 - [ ] Unit/integration tests added
 - [ ] Dashboard type + API client updated
