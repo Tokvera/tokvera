@@ -155,7 +155,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Keep marketing, docs, and dashboard setup content on one shared integration/content model
 
 ### E2E, Smoke, and Release Gates
-- [ ] Add product-path Playwright coverage for onboarding, traces/live traces, trace detail, API key setup, and docs/integration navigation
+- [x] Add product-path Playwright coverage for onboarding, traces/live traces, trace detail, API key setup, and docs/integration navigation
 - [ ] Keep public smoke/soak suite current with local smoke, production smoke, runtime visibility, integration soak, duplicate-emission detection, and lifecycle completeness
 - [ ] Add official integration compatibility matrix gate for overview, traces, live traces, trace detail/inspector, and Action Center visibility
 - [ ] Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done
