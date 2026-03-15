@@ -34,6 +34,7 @@ This repository is the public coordination and documentation entry point for the
 - `examples/templates` (copy-ready starter packs + live-trace checklists)
 - `test/sdk-examples` (smoke and production-gate helpers)
 - `test/generate-activation-report.mjs` (weekly paid-tenant and activation gate report)
+- `test/generate-weekly-ops-review.mjs` (weekly billing reliability + operating-window review)
 
 These include trace context, evaluation signals, and framework integration patterns.
 They also now demonstrate lifecycle-enabled live tracing so runs can appear immediately in
@@ -87,6 +88,23 @@ pre-gateway funnel:
 - tenants with first event
 - tenants that opened live traces with real rows
 - tenants that reached a real trace-debugging session
+
+Run the weekly ops review against production or staging:
+
+```bash
+set TOKVERA_API_BASE_URL=https://api.tokvera.org
+set TOKVERA_ADMIN_TOKEN=...
+set TOKVERA_TEST_EMAIL=verified-user@example.com
+set TOKVERA_TEST_PASSWORD=...
+node test/generate-weekly-ops-review.mjs
+```
+
+This writes JSON and Markdown artifacts under `test/artifacts/` and combines:
+
+- active paid tenant gate status
+- billing health and webhook reliability
+- 7-day operating-window evidence
+- target-tenant activation review flags
 
 ## Release Rule Enforcement
 

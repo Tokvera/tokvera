@@ -1,0 +1,45 @@
+name: weekly-ops-review
+
+on:
+  workflow_dispatch:
+    inputs:
+      require_healthy:
+        description: "Fail workflow when the weekly review surfaces blocking flags"
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: "20 4 * * 1"
+
+jobs:
+  weekly-ops-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TOKVERA_API_BASE_URL: ${{ secrets.TOKVERA_API_BASE_URL }}
+      TOKVERA_ADMIN_TOKEN: ${{ secrets.TOKVERA_ADMIN_TOKEN }}
+      TOKVERA_TEST_EMAIL: ${{ secrets.TOKVERA_TEST_EMAIL }}
+      TOKVERA_TEST_PASSWORD: ${{ secrets.TOKVERA_TEST_PASSWORD }}
+      TOKVERA_TEST_TENANT_ID: ${{ secrets.TOKVERA_TEST_TENANT_ID }}
+      TOKVERA_TEST_PROJECT_ID: ${{ secrets.TOKVERA_TEST_PROJECT_ID }}
+      TOKVERA_WEEKLY_OPS_JSON: test/artifacts/weekly-ops-review.json
+      TOKVERA_WEEKLY_OPS_MD: test/artifacts/weekly-ops-review.md
+      TOKVERA_WEEKLY_OPS_REQUIRE_HEALTH: ${{ github.event.inputs.require_healthy || 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate weekly ops review
+        run: node test/generate-weekly-ops-review.mjs
+
+      - name: Upload weekly ops review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-ops-review
+          path: test/artifacts/

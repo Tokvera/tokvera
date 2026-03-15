@@ -1,0 +1,78 @@
+{
+  "tenant_id": "ten_fixture",
+  "project_id": "proj_fixture",
+  "project_name": "Fixture Project",
+  "activation_report": {
+    "generated_at": "2026-03-15T04:00:00.000Z",
+    "target": {
+      "current": 5,
+      "goal": 20,
+      "remaining": 15
+    },
+    "items": [
+      {
+        "tenant_id": "ten_fixture",
+        "tenant_name": "Fixture Tenant",
+        "request_count_30d": 18,
+        "total_cost_usd_30d": 2.14,
+        "last_event_at": "2026-03-14T12:00:00.000Z",
+        "activation": {
+          "is_active_paid_tenant_30d": true,
+          "has_first_event_30d": true,
+          "has_live_trace_review_30d": true,
+          "has_trace_debug_session_30d": true,
+          "blockers": []
+        }
+      }
+    ]
+  },
+  "activation_item": {
+    "tenant_id": "ten_fixture",
+    "tenant_name": "Fixture Tenant",
+    "request_count_30d": 18,
+    "total_cost_usd_30d": 2.14,
+    "last_event_at": "2026-03-14T12:00:00.000Z",
+    "activation": {
+      "is_active_paid_tenant_30d": true,
+      "has_first_event_30d": true,
+      "has_live_trace_review_30d": true,
+      "has_trace_debug_session_30d": true,
+      "blockers": []
+    }
+  },
+  "billing_summary": {
+    "plan": { "id": "growth" },
+    "subscription": { "status": "active" }
+  },
+  "billing_health": {
+    "webhook": {
+      "configured": true,
+      "is_stale": false,
+      "unresolved_failed_total": 0
+    },
+    "alerts": {
+      "webhook_failure": {
+        "failed_last_24h": 0
+      }
+    }
+  },
+  "billing_entitlements": {
+    "plan": { "id": "growth" }
+  },
+  "billing_metering": {
+    "current_usage": {
+      "requests": 18
+    }
+  },
+  "metrics_timeseries": {
+    "points": [
+      { "bucket_start": "2026-03-08T00:00:00.000Z", "request_count": 2, "cost_usd": 0.14 },
+      { "bucket_start": "2026-03-09T00:00:00.000Z", "request_count": 3, "cost_usd": 0.20 },
+      { "bucket_start": "2026-03-10T00:00:00.000Z", "request_count": 4, "cost_usd": 0.31 },
+      { "bucket_start": "2026-03-11T00:00:00.000Z", "request_count": 2, "cost_usd": 0.18 },
+      { "bucket_start": "2026-03-12T00:00:00.000Z", "request_count": 3, "cost_usd": 0.24 },
+      { "bucket_start": "2026-03-13T00:00:00.000Z", "request_count": 2, "cost_usd": 0.19 },
+      { "bucket_start": "2026-03-14T00:00:00.000Z", "request_count": 2, "cost_usd": 0.16 }
+    ]
+  }
+}

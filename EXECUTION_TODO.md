@@ -169,7 +169,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ### Commercial Readiness
 - [x] Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics
 - [x] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
-- [ ] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
+- [x] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
 - [x] Generate automated report for 20 active paid tenants gate
 
 ## Phase D (Gateway Alpha / M5) - starts only after M4.8

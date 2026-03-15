@@ -1,0 +1,75 @@
+{
+  "id": "2026-03-15-weekly-ops-review",
+  "title": "Keep weekly operating-window and billing reliability review active",
+  "date": "2026-03-15",
+  "summary": "Adds a coordination-repo weekly ops review generator, fixture-driven validation, a scheduled workflow, and production-operations docs updates so billing reliability and 7-day operating-window evidence stay visible before gateway work.",
+  "completed_todo_items": [
+    "Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/generate-weekly-ops-review.mjs",
+          "test/generate-weekly-ops-review.test.mjs",
+          "test/fixtures/weekly-ops-review.fixture.json",
+          ".github/workflows/weekly-ops-review.yml"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node --test test/generate-weekly-ops-review.test.mjs"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/production-operations/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/fixtures/weekly-ops-review.fixture.json"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "TOKVERA_WEEKLY_OPS_FIXTURE=test/fixtures/weekly-ops-review.fixture.json node test/generate-weekly-ops-review.mjs"
+        ],
+        "notes": "Validated through fixture mode by setting TOKVERA_WEEKLY_OPS_FIXTURE and writing markdown/json artifacts."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npm run docs:check",
+          "npm run build"
+        ],
+        "notes": "Confirms the new production-operations docs path builds and remains link-valid."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the weekly-ops-review workflow, generator, fixture, docs references, and checklist completion if the review flow produces misleading or noisy alerts."
+  }
+}
