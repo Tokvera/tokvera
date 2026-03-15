@@ -116,6 +116,7 @@ Goal: defer gateway until Tokvera has 20 active paid tenants and a beginner-firs
   - Wave 2: Java + .NET
   - Wave 3: PHP + Rust
   - each wave requires docs, examples, canonical contract, live lifecycle, and dashboard visibility parity before promotion
+  - `tokvera-go` scaffold can land before promotion, but the phase item stays open until those gates pass
 
 ### Phase 3: Gateway Alpha (M5, starts only after Phase 2.9)
 

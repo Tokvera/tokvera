@@ -162,6 +162,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
 ### SDK Expansion Before Gateway
 - [ ] Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility
+  - Current state: CI-first scaffold is allowed, but this stays open until Go CI, canonical contract checks, lifecycle/live traces visibility, and dashboard visibility all pass
 - [ ] Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable
 - [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
@@ -217,6 +218,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Repo Mapping
 
 - `tokvera-api`: billing/tracing enforcement, contracts, smoke, lifecycle, gateway prep
+- `tokvera-go`: Wave 1 Go SDK scaffold and qualification path
 - `tokvera-dashboard`: operational UX, billing/tracing visibility, explainability
 - `tokvera-js` and `tokvera-python`: telemetry compatibility + gateway mode support
 - `tokvera-analytics-engine`: aggregation/detectors/savings scoring

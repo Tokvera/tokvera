@@ -18,6 +18,7 @@ This repository is the public coordination and documentation entry point for the
 - `tokvera`: public roadmap, docs links, examples, execution checklist
 - `tokvera-js`: JavaScript SDK
 - `tokvera-python`: Python SDK
+- `tokvera-go`: Go SDK scaffold (CI-first, not official yet)
 - `tokvera-api`: ingestion, auth, billing, traces, integrations API
 - `tokvera-dashboard`: app + docs + onboarding UX
 - `tokvera-analytics-engine`: async aggregation, budgets, anomalies
@@ -26,6 +27,7 @@ This repository is the public coordination and documentation entry point for the
 
 - JavaScript: `https://www.npmjs.com/package/@tokvera/sdk`
 - Python: `https://pypi.org/project/tokvera/`
+- Go: local scaffold in `tokvera-go` pending CI, contract, and dashboard-visibility qualification
 
 ## Examples
 
@@ -71,6 +73,10 @@ The current focus is product-led adoption for SaaS app teams:
 - stronger existing-app and multi-model tracing flows
 - broader docs, blog, and comparison content
 - phased new SDK waves: Go, then Java + .NET, then PHP + Rust
+
+The current Go wave is intentionally CI-first:
+- `tokvera-go` now exists as a separate repo scaffold
+- it is not official until CI, canonical contract checks, live lifecycle visibility, and dashboard visibility all pass
 
 ## Operating Reports
 
