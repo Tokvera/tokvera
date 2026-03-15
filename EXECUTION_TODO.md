@@ -19,9 +19,10 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] M4.4 Integration Platform v1 (12 official integrations) by 2026-08-31
 - [ ] M4.5 Tracing beta completion by 2026-06-30
 - [ ] M4.6 Evaluation signals v1 by 2026-06-30
-- [ ] M5 Gateway alpha by 2026-10-31
+- [ ] M4.8 Product-Led Adoption: 20 active paid tenants before gateway starts
+- [ ] M5 Gateway alpha (strictly blocked until M4.8 is complete)
 - [ ] M6 Savings demo by 2026-12-15
-- [ ] M7 10 active SaaS users by 2027-03-31
+- [ ] M7 Sustain 20 active SaaS users with healthy activation and retention loops
 - [ ] M8 $10k MRR by 2027-03-31
 
 ## Current Baseline (already in code)
@@ -138,7 +139,40 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add duplicate-emission regression tests for mixed manual/wrapper/runtime-helper compositions
 - [x] Add local integration soak gate for lifecycle completeness and duplicate `(trace_id, span_id, status)` detection
 
-## Phase C (Gateway Alpha / M5) - Sep 1 to Oct 31, 2026
+## Phase C (Product-Led Adoption / M4.8) - before any gateway implementation
+
+### Product Usability and Conversion
+- [ ] Rework signup -> project -> API key -> first event -> live trace into one guided first-run path
+- [ ] Standardize empty states across Overview, Traces, Live Traces, Trace Detail, API Keys, and Billing
+- [ ] Add persistent beginner guidance on core dashboard pages
+- [ ] Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup
+- [ ] Add guided setup variants for existing app, multi-model, provider-wrapper-first, framework, and agent-runtime teams
+
+### Documentation and Acquisition Content
+- [ ] Maintain canonical docs tracks for quickstart, existing app/manual tracing, multi-model tracing, live tracing, trace debugging, billing/ops, and integration matrix
+- [ ] Ship 2 practical blog posts every sprint
+- [ ] Add comparison and acquisition pages for Tokvera vs LangSmith, Tokvera vs generic dashboards, and SaaS app teams
+- [ ] Keep marketing, docs, and dashboard setup content on one shared integration/content model
+
+### E2E, Smoke, and Release Gates
+- [ ] Add product-path Playwright coverage for onboarding, traces/live traces, trace detail, API key setup, and docs/integration navigation
+- [ ] Keep public smoke/soak suite current with local smoke, production smoke, runtime visibility, integration soak, duplicate-emission detection, and lifecycle completeness
+- [ ] Add official integration compatibility matrix gate for overview, traces, live traces, trace detail/inspector, and Action Center visibility
+- [ ] Enforce release checklist rule: code + tests + docs + example + smoke/visibility gate before marking items done
+
+### SDK Expansion Before Gateway
+- [ ] Wave 1: ship `tokvera-go` with manual tracer substrate, provider wrappers, OTel exporter/bridge, docs, examples, contract tests, and live traces compatibility
+- [ ] Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable
+- [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
+- [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
+
+### Commercial Readiness
+- [ ] Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics
+- [ ] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
+- [ ] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
+- [ ] Generate automated report for 20 active paid tenants gate
+
+## Phase D (Gateway Alpha / M5) - starts only after M4.8
 
 - [ ] Stand up `tokvera-gateway` service
 - [ ] Implement `/v1/chat/completions` proxy compatibility
@@ -147,9 +181,9 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Emit canonical telemetry from gateway path
 - [ ] p95 proxy overhead target (<80ms non-streaming)
 - [ ] Two tenants on real traffic through gateway alpha
-- [ ] Start Phase C only after M4.4 integration gate is complete
+- [ ] Start Phase D only after M4.8 product-led adoption gate is complete
 
-## Phase D (Savings Demo / M6) - Oct 1 to Dec 15, 2026
+## Phase E (Savings Demo / M6) - Oct 1 to Dec 15, 2026
 
 - [ ] Recommendation-only prompt compression suggestions
 - [ ] Model downgrade recommendation engine
@@ -158,13 +192,13 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Confidence + quality-risk bands for recommendations
 - [ ] 3 production tenants with measurable savings dashboards
 
-## Phase E (M7 + M8 Growth) - Dec 16, 2026 to Mar 31, 2027
+## Phase F (M7 + M8 Growth) - Dec 16, 2026 to Mar 31, 2027
 
 - [ ] Maintain integration packs (JS/Python, Express/FastAPI, LangChain/LlamaIndex)
 - [ ] Monthly docs refresh with incident-to-fix workflows
 - [ ] Weekly action-center digest for account owners
 - [ ] Churn/upgrade review loop based on usage + billing signals
-- [ ] Reach 10 active SaaS users
+- [ ] Sustain 20 active SaaS users
 - [ ] Reach $10k MRR
 
 ## Release Checklist Template (use each 2-week cycle)

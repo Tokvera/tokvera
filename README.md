@@ -46,3 +46,16 @@ They also now demonstrate lifecycle-enabled live tracing so runs can appear imme
 
 - App and docs: `https://tokvera.org`
 - API base: `https://api.tokvera.org`
+
+## Current Strategic Gate
+
+Tokvera is explicitly deferring gateway implementation until the platform reaches:
+- **20 active paid tenants**
+- stable billing, usage, and live tracing operations
+- verified integration compatibility and docs quality gates
+
+The current focus is product-led adoption for SaaS app teams:
+- easier onboarding and API key setup
+- stronger existing-app and multi-model tracing flows
+- broader docs, blog, and comparison content
+- phased new SDK waves: Go, then Java + .NET, then PHP + Rust

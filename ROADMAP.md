@@ -3,7 +3,7 @@
 ## Product Direction
 
 Tokvera is a unified **Cost + Trace Intelligence** control plane.  
-Execution priority before gateway: broaden integration coverage with strict quality gates so adoption compounds faster.
+Execution priority before gateway: broaden integration coverage, improve beginner-first adoption, and reach 20 active paid tenants before any gateway implementation begins.
 
 ## Delivery Phases
 
@@ -87,7 +87,37 @@ Goal: broaden integration space before gateway to maximize real production adopt
   - `beta`: AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway integration
   - `planned`: Semantic Kernel, Microsoft Agent Framework, Deep Agents, non-JS/non-Python surfaces
 
-### Phase 3: Gateway Alpha (M5)
+### Phase 2.9: Product-Led Adoption (before gateway)
+
+Goal: defer gateway until Tokvera has 20 active paid tenants and a beginner-first self-serve product motion that compounds adoption.
+
+- Add milestone **M4.8 Product-Led Adoption**
+- Lock gateway behind:
+  - 20 active paid tenants
+  - stable billing/usage/tracing operations
+  - integration compatibility soak coverage
+- Rework onboarding around:
+  - signup/login
+  - project + API key setup
+  - existing-app/manual tracing or stack-specific quickstart
+  - first event verification in `/dashboard/traces/live`
+- Add SaaS-team acquisition surfaces:
+  - comparison pages
+  - stack chooser guides
+  - existing-app and multi-model docs tracks
+  - practical blog cadence
+- Expand product-path quality gates:
+  - onboarding E2E
+  - live tracing E2E
+  - official integration visibility matrix
+  - checkout -> active subscription -> usage sync coverage
+- Expand SDK surface quality-first:
+  - Wave 1: Go
+  - Wave 2: Java + .NET
+  - Wave 3: PHP + Rust
+  - each wave requires docs, examples, canonical contract, live lifecycle, and dashboard visibility parity before promotion
+
+### Phase 3: Gateway Alpha (M5, starts only after Phase 2.9)
 
 - Stand up `tokvera-gateway` service
 - Implement `/v1/chat/completions` proxy compatibility
@@ -143,7 +173,8 @@ Goal: broaden integration space before gateway to maximize real production adopt
 - M4.4 Integration Platform v1 (12 official integrations): **by Aug 31, 2026**
 - M4.5 Tracing beta completion: **by Jun 30, 2026**
 - M4.6 Evaluation signals v1: **by Jun 30, 2026**
-- M5 Gateway alpha: **by Oct 31, 2026**
+- M4.8 Product-Led Adoption: **20 active paid tenants before gateway starts**
+- M5 Gateway alpha: **starts only after M4.8**
 - M6 Savings feature demo: **by Dec 15, 2026**
-- M7 10 active SaaS users: **by Mar 31, 2027**
+- M7 Sustain 20 active SaaS users: **after gateway readiness and growth loops are stable**
 - M8 $10k MRR: **by Mar 31, 2027**
