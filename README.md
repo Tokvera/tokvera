@@ -32,6 +32,7 @@ This repository is the public coordination and documentation entry point for the
 - `examples/node`
 - `examples/python`
 - `test/sdk-examples` (smoke and production-gate helpers)
+- `test/generate-activation-report.mjs` (weekly paid-tenant and activation gate report)
 
 These include trace context, evaluation signals, and framework integration patterns.
 They also now demonstrate lifecycle-enabled live tracing so runs can appear immediately in
@@ -59,3 +60,16 @@ The current focus is product-led adoption for SaaS app teams:
 - stronger existing-app and multi-model tracing flows
 - broader docs, blog, and comparison content
 - phased new SDK waves: Go, then Java + .NET, then PHP + Rust
+
+## Operating Reports
+
+Run the paid-tenant activation report against production or staging:
+
+```bash
+set TOKVERA_API_BASE_URL=https://api.tokvera.org
+set TOKVERA_ADMIN_TOKEN=...
+node test/generate-activation-report.mjs
+```
+
+This writes JSON and Markdown artifacts under `test/artifacts/` and tracks the current
+`active_paid_tenants_30d` gate before any gateway work starts.

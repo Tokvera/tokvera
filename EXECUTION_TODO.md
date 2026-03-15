@@ -142,7 +142,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Phase C (Product-Led Adoption / M4.8) - before any gateway implementation
 
 ### Product Usability and Conversion
-- [ ] Rework signup -> project -> API key -> first event -> live trace into one guided first-run path
+- [x] Rework signup -> project -> API key -> first event -> live trace into one guided first-run path
 - [ ] Standardize empty states across Overview, Traces, Live Traces, Trace Detail, API Keys, and Billing
 - [ ] Add persistent beginner guidance on core dashboard pages
 - [ ] Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup
@@ -170,7 +170,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Add weekly customer activation review using signup, project creation, key creation, first event, first live trace, first trace-debugging session, and paid conversion metrics
 - [ ] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
 - [ ] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
-- [ ] Generate automated report for 20 active paid tenants gate
+- [x] Generate automated report for 20 active paid tenants gate
 
 ## Phase D (Gateway Alpha / M5) - starts only after M4.8
 
