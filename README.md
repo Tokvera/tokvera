@@ -19,6 +19,8 @@ This repository is the public coordination and documentation entry point for the
 - `tokvera-js`: JavaScript SDK
 - `tokvera-python`: Python SDK
 - `tokvera-go`: Go SDK
+- `tokvera-java`: Java SDK
+- `tokvera-dotnet`: .NET SDK
 - `tokvera-api`: ingestion, auth, billing, traces, integrations API
 - `tokvera-dashboard`: app + docs + onboarding UX
 - `tokvera-analytics-engine`: async aggregation, budgets, anomalies
@@ -28,6 +30,8 @@ This repository is the public coordination and documentation entry point for the
 - JavaScript: `https://www.npmjs.com/package/@tokvera/sdk`
 - Python: `https://pypi.org/project/tokvera/`
 - Go: `tokvera-go` Wave 1 SDK with manual tracing, provider wrappers, OTel bridge, and live traces compatibility
+- Java: `tokvera-java` Wave 2 SDK with manual tracing, provider wrappers, OTel bridge, shared smoke/soak, and dashboard visibility coverage
+- .NET: `tokvera-dotnet` Wave 2 SDK with manual tracing, provider wrappers, OTel bridge, shared smoke/soak, and dashboard visibility coverage
 
 ## Examples
 
@@ -79,6 +83,13 @@ The current Go wave is now qualified for Wave 1:
 - canonical contract verification passes
 - Go lifecycle rows and trace detail visibility pass in the dashboard
 - smoke, soak, and production visibility checks pass with Go examples included
+
+Wave 2 is now qualified across Java and .NET:
+- `tokvera-java` passes local Gradle build and tests
+- `tokvera-dotnet` passes local `dotnet test`
+- canonical contract verification passes
+- shared smoke, soak, and production visibility now include Java and .NET
+- Java and .NET lifecycle rows and trace detail visibility pass in the dashboard
 
 ## Operating Reports
 

@@ -12,6 +12,8 @@ const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
+const localJavaSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-java");
+const localDotnetSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-dotnet");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8788);
 const ingestUrl = `http://127.0.0.1:${mockPort}/v1/events`;
@@ -88,11 +90,28 @@ function hasLocalGoSdk() {
   return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
 }
 
+function hasLocalJavaSdk() {
+  return fs.existsSync(path.join(localJavaSdkDir, "build.gradle.kts"));
+}
+
+function hasLocalDotnetSdk() {
+  return fs.existsSync(path.join(localDotnetSdkDir, "Tokvera.sln"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
     ...baseEnv,
     PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
+  };
+}
+
+function buildJavaEnv(baseEnv, javaHome) {
+  if (!javaHome) return { ...baseEnv };
+  return {
+    ...baseEnv,
+    JAVA_HOME: javaHome,
+    PATH: [path.join(javaHome, "bin"), baseEnv.PATH].filter(Boolean).join(path.delimiter),
   };
 }
 
@@ -148,6 +167,50 @@ async function resolveGoCommand() {
   return null;
 }
 
+function getPortableJavaExecutableName() {
+  return process.platform === "win32" ? "java.exe" : "java";
+}
+
+function getGradleCommand() {
+  return process.platform === "win32" ? "gradlew.bat" : "./gradlew";
+}
+
+async function resolveJavaHome() {
+  const portableName = getPortableJavaExecutableName();
+  const candidates = [
+    process.env.TOKVERA_JAVA_HOME,
+    process.env.JAVA_HOME,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "jdk-21.0.6+7"),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const javaBin = path.join(candidate, "bin", portableName);
+    if (!fs.existsSync(javaBin)) continue;
+    try {
+      await run(javaBin, ["-version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  try {
+    await run("java", ["-version"], { silent: true });
+    return "";
+  } catch {
+    return null;
+  }
+}
+
+async function resolveDotnetCommand() {
+  try {
+    await run("dotnet", ["--version"], { silent: true });
+    return "dotnet";
+  } catch {
+    return null;
+  }
+}
+
 function buildFeatureEnv(round) {
   return {
     TOKVERA_FEATURE_EXISTING_APP_JS: `soak_existing_app_js_${round}`,
@@ -179,6 +242,12 @@ function buildFeatureEnv(round) {
     TOKVERA_FEATURE_EXISTING_APP_GO: `soak_existing_app_go_${round}`,
     TOKVERA_FEATURE_PROVIDERS_GO: `soak_provider_wrappers_go_${round}`,
     TOKVERA_FEATURE_OTEL_GO: `soak_otel_go_${round}`,
+    TOKVERA_FEATURE_EXISTING_APP_JAVA: `soak_existing_app_java_${round}`,
+    TOKVERA_FEATURE_PROVIDERS_JAVA: `soak_provider_wrappers_java_${round}`,
+    TOKVERA_FEATURE_OTEL_JAVA: `soak_otel_java_${round}`,
+    TOKVERA_FEATURE_EXISTING_APP_DOTNET: `soak_existing_app_dotnet_${round}`,
+    TOKVERA_FEATURE_PROVIDERS_DOTNET: `soak_provider_wrappers_dotnet_${round}`,
+    TOKVERA_FEATURE_OTEL_DOTNET: `soak_otel_dotnet_${round}`,
   };
 }
 
@@ -269,6 +338,12 @@ async function main() {
     const pythonEnvBase = buildPythonEnv(sharedEnv);
     const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
     const goEnabled = Boolean(go && hasLocalGoSdk());
+    const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
+    const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
+    const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
+    const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+    const gradleCommand = getGradleCommand();
+    const javaEnvBase = buildJavaEnv(sharedEnv, javaHome);
 
     for (let round = 1; round <= soakRounds; round += 1) {
       const featureEnv = buildFeatureEnv(round);
@@ -320,6 +395,76 @@ async function main() {
             ...sharedEnv,
             TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_GO,
             TOKVERA_TENANT_ID: "tenant_demo_go",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+      }
+
+      if (javaEnabled) {
+        console.log(`[soak] round ${round}/${soakRounds}: java manual tracer`);
+        await run(gradleCommand, ["--quiet", "runManualExample"], {
+          cwd: localJavaSdkDir,
+          env: {
+            ...javaEnvBase,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_EXISTING_APP_JAVA,
+            TOKVERA_TENANT_ID: "tenant_demo_java",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: java provider wrappers`);
+        await run(gradleCommand, ["--quiet", "runProviderWrappersExample"], {
+          cwd: localJavaSdkDir,
+          env: {
+            ...javaEnvBase,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_PROVIDERS_JAVA,
+            TOKVERA_TENANT_ID: "tenant_demo_java",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: java otel bridge`);
+        await run(gradleCommand, ["--quiet", "runOtelBridgeExample"], {
+          cwd: localJavaSdkDir,
+          env: {
+            ...javaEnvBase,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_JAVA,
+            TOKVERA_TENANT_ID: "tenant_demo_java",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+      }
+
+      if (dotnetEnabled) {
+        console.log(`[soak] round ${round}/${soakRounds}: dotnet manual tracer`);
+        await run(dotnet, ["run", "--project", path.join("examples", "ManualTracer", "ManualTracer.csproj")], {
+          cwd: localDotnetSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_EXISTING_APP_DOTNET,
+            TOKVERA_TENANT_ID: "tenant_demo_dotnet",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: dotnet provider wrappers`);
+        await run(dotnet, ["run", "--project", path.join("examples", "ProviderWrappers", "ProviderWrappers.csproj")], {
+          cwd: localDotnetSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_PROVIDERS_DOTNET,
+            TOKVERA_TENANT_ID: "tenant_demo_dotnet",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: dotnet otel bridge`);
+        await run(dotnet, ["run", "--project", path.join("examples", "OtelBridge", "OtelBridge.csproj")], {
+          cwd: localDotnetSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_DOTNET,
+            TOKVERA_TENANT_ID: "tenant_demo_dotnet",
             TOKVERA_ENVIRONMENT: "soak",
           },
         });

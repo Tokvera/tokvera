@@ -1,0 +1,119 @@
+{
+  "id": "2026-03-16-dotnet-sdk-wave2",
+  "title": "Close Wave 2 with the .NET SDK qualification",
+  "date": "2026-03-16",
+  "summary": "Closes the Java + .NET Wave 2 SDK item after the .NET SDK passes local tests, canonical contract checks, shared smoke and soak, production lifecycle visibility, dashboard visibility, docs, and examples.",
+  "completed_todo_items": [
+    "Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dotnet",
+        "paths": [
+          "src/Tokvera/TokveraTracer.cs",
+          "src/Tokvera/TokveraClient.cs",
+          "src/Tokvera/TokveraOtelBridge.cs",
+          "src/Tokvera/TokveraEvent.cs",
+          "src/Tokvera/TrackOptions.cs",
+          "examples/ManualTracer/Program.cs",
+          "examples/ProviderWrappers/Program.cs",
+          "examples/OtelBridge/Program.cs"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/sdk-examples/run-smoke.mjs",
+          "test/sdk-examples/run-integration-soak.mjs",
+          "test/sdk-examples/run-runtime-helper-visibility.mjs",
+          "README.md",
+          "ROADMAP.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/dotnet-sdk/page.tsx",
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "lib/docs-content.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dotnet",
+        "commands": [
+          "dotnet test Tokvera.sln",
+          "dotnet build examples/ManualTracer/ManualTracer.csproj",
+          "dotnet build examples/ProviderWrappers/ProviderWrappers.csproj",
+          "dotnet build examples/OtelBridge/OtelBridge.csproj",
+          "node scripts/check-canonical-contract.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "ROADMAP.md",
+          "EXECUTION_TODO.md"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/dotnet-sdk/page.tsx",
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "lib/docs-content.ts"
+        ]
+      },
+      {
+        "repo": "tokvera-dotnet",
+        "paths": [
+          "README.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dotnet",
+        "paths": [
+          "examples/ManualTracer",
+          "examples/ProviderWrappers",
+          "examples/OtelBridge"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sdk-examples/run-smoke.mjs",
+          "node test/sdk-examples/run-integration-soak.mjs",
+          "node test/sdk-examples/run-runtime-helper-visibility.mjs"
+        ],
+        "notes": "Confirms .NET telemetry survives local smoke, lifecycle soak, and production visibility checks across overview, traces, live traces, trace detail, and inspector."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the .NET SDK repo changes, the shared smoke and visibility runner additions, the Wave 2 coordination docs updates, and the dashboard docs page if any post-qualification regression is found."
+  }
+}

@@ -13,6 +13,8 @@ const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
+const localJavaSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-java");
+const localDotnetSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-dotnet");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8787);
 const ingestUrl = `http://127.0.0.1:${mockPort}/v1/events`;
@@ -54,6 +56,12 @@ const runtimeHelperFeatures = {
   goExistingApp: process.env.TOKVERA_FEATURE_EXISTING_APP_GO || "runtime_existing_app_go",
   goProviders: process.env.TOKVERA_FEATURE_PROVIDERS_GO || "runtime_provider_wrappers_go",
   goOTel: process.env.TOKVERA_FEATURE_OTEL_GO || "runtime_otel_go",
+  javaExistingApp: process.env.TOKVERA_FEATURE_EXISTING_APP_JAVA || "runtime_existing_app_java",
+  javaProviders: process.env.TOKVERA_FEATURE_PROVIDERS_JAVA || "runtime_provider_wrappers_java",
+  javaOTel: process.env.TOKVERA_FEATURE_OTEL_JAVA || "runtime_otel_java",
+  dotnetExistingApp: process.env.TOKVERA_FEATURE_EXISTING_APP_DOTNET || "runtime_existing_app_dotnet",
+  dotnetProviders: process.env.TOKVERA_FEATURE_PROVIDERS_DOTNET || "runtime_provider_wrappers_dotnet",
+  dotnetOTel: process.env.TOKVERA_FEATURE_OTEL_DOTNET || "runtime_otel_dotnet",
 };
 
 function run(command, args, options = {}) {
@@ -103,11 +111,28 @@ function hasLocalGoSdk() {
   return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
 }
 
+function hasLocalJavaSdk() {
+  return fs.existsSync(path.join(localJavaSdkDir, "build.gradle.kts"));
+}
+
+function hasLocalDotnetSdk() {
+  return fs.existsSync(path.join(localDotnetSdkDir, "Tokvera.sln"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
     ...baseEnv,
     PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
+  };
+}
+
+function buildJavaEnv(baseEnv, javaHome) {
+  if (!javaHome) return { ...baseEnv };
+  return {
+    ...baseEnv,
+    JAVA_HOME: javaHome,
+    PATH: [path.join(javaHome, "bin"), baseEnv.PATH].filter(Boolean).join(path.delimiter),
   };
 }
 
@@ -149,6 +174,50 @@ async function resolveGoCommand() {
   }
 
   return null;
+}
+
+function getPortableJavaExecutableName() {
+  return process.platform === "win32" ? "java.exe" : "java";
+}
+
+function getGradleCommand() {
+  return process.platform === "win32" ? "gradlew.bat" : "./gradlew";
+}
+
+async function resolveJavaHome() {
+  const portableName = getPortableJavaExecutableName();
+  const candidates = [
+    process.env.TOKVERA_JAVA_HOME,
+    process.env.JAVA_HOME,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "jdk-21.0.6+7"),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const javaBin = path.join(candidate, "bin", portableName);
+    if (!fs.existsSync(javaBin)) continue;
+    try {
+      await run(javaBin, ["-version"]);
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  try {
+    await run("java", ["-version"]);
+    return "";
+  } catch {
+    return null;
+  }
+}
+
+async function resolveDotnetCommand() {
+  try {
+    await run("dotnet", ["--version"], { silent: true });
+    return "dotnet";
+  } catch {
+    return null;
+  }
 }
 
 async function waitForServer(url, maxAttempts = 20) {
@@ -303,6 +372,85 @@ async function main() {
       console.log("[smoke] skipping go examples (tokvera-go repo or go toolchain unavailable)");
     }
 
+    const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
+    const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
+    if (javaEnabled) {
+      const javaEnv = {
+        ...buildJavaEnv(sharedEnv, javaHome),
+        TOKVERA_TENANT_ID: "tenant_demo_java",
+        TOKVERA_ENVIRONMENT: "dev",
+      };
+      const gradleCommand = getGradleCommand();
+
+      console.log("[smoke] running java manual tracer example");
+      await run(gradleCommand, ["--quiet", "runManualExample"], {
+        cwd: localJavaSdkDir,
+        env: {
+          ...javaEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.javaExistingApp,
+        },
+      });
+
+      console.log("[smoke] running java provider wrappers example");
+      await run(gradleCommand, ["--quiet", "runProviderWrappersExample"], {
+        cwd: localJavaSdkDir,
+        env: {
+          ...javaEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.javaProviders,
+        },
+      });
+
+      console.log("[smoke] running java otel bridge example");
+      await run(gradleCommand, ["--quiet", "runOtelBridgeExample"], {
+        cwd: localJavaSdkDir,
+        env: {
+          ...javaEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.javaOTel,
+        },
+      });
+    } else {
+      console.log("[smoke] skipping java examples (tokvera-java repo or java toolchain unavailable)");
+    }
+
+    const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
+    const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+    if (dotnetEnabled) {
+      const dotnetEnv = {
+        ...sharedEnv,
+        TOKVERA_TENANT_ID: "tenant_demo_dotnet",
+        TOKVERA_ENVIRONMENT: "dev",
+      };
+
+      console.log("[smoke] running dotnet manual tracer example");
+      await run(dotnet, ["run", "--project", path.join("examples", "ManualTracer", "ManualTracer.csproj")], {
+        cwd: localDotnetSdkDir,
+        env: {
+          ...dotnetEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.dotnetExistingApp,
+        },
+      });
+
+      console.log("[smoke] running dotnet provider wrappers example");
+      await run(dotnet, ["run", "--project", path.join("examples", "ProviderWrappers", "ProviderWrappers.csproj")], {
+        cwd: localDotnetSdkDir,
+        env: {
+          ...dotnetEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.dotnetProviders,
+        },
+      });
+
+      console.log("[smoke] running dotnet otel bridge example");
+      await run(dotnet, ["run", "--project", path.join("examples", "OtelBridge", "OtelBridge.csproj")], {
+        cwd: localDotnetSdkDir,
+        env: {
+          ...dotnetEnv,
+          TOKVERA_FEATURE: runtimeHelperFeatures.dotnetOTel,
+        },
+      });
+    } else {
+      console.log("[smoke] skipping dotnet examples (tokvera-dotnet repo or dotnet toolchain unavailable)");
+    }
+
     // Allow final async sends to complete.
     await sleep(1000);
     const statsResponse = await fetch(statsUrl);
@@ -323,13 +471,23 @@ async function main() {
       runtimeHelperFeatures.goProviders,
       runtimeHelperFeatures.goOTel,
     ];
-    const shouldExpectGo = goEnabled;
-    const missingFeatures = expectedFeatures.filter(
-      (feature) => Number(stats.features?.[feature] || 0) < 1
-    );
-    const relevantMissingFeatures = shouldExpectGo
-      ? missingFeatures
-      : missingFeatures.filter((feature) => !goFeatures.includes(feature));
+    const javaFeatures = [
+      runtimeHelperFeatures.javaExistingApp,
+      runtimeHelperFeatures.javaProviders,
+      runtimeHelperFeatures.javaOTel,
+    ];
+    const dotnetFeatures = [
+      runtimeHelperFeatures.dotnetExistingApp,
+      runtimeHelperFeatures.dotnetProviders,
+      runtimeHelperFeatures.dotnetOTel,
+    ];
+    const missingFeatures = expectedFeatures.filter((feature) => Number(stats.features?.[feature] || 0) < 1);
+    const relevantMissingFeatures = missingFeatures.filter((feature) => {
+      if (goFeatures.includes(feature) && !goEnabled) return false;
+      if (javaFeatures.includes(feature) && !javaEnabled) return false;
+      if (dotnetFeatures.includes(feature) && !dotnetEnabled) return false;
+      return true;
+    });
     if (relevantMissingFeatures.length) {
       throw new Error(`missing expected feature coverage: ${relevantMissingFeatures.join(", ")}`);
     }

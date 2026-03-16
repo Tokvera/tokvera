@@ -12,6 +12,8 @@ const pythonRuntimeHelpersPath = path.join(__dirname, "python-example", "runtime
 const localNodeSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-js");
 const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-python");
 const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
+const localJavaSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-java");
+const localDotnetSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-dotnet");
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const baseUrl = (process.env.TOKVERA_API_BASE_URL || "https://api.tokvera.org").replace(/\/$/, "");
@@ -68,22 +70,34 @@ const goFeatures = {
   otel: `vis_otel_go_${now}`,
 };
 
-function getAllFeatures(goEnabled) {
-  return goEnabled
-    ? [...Object.values(nodeFeatures), ...Object.values(pythonFeatures), ...Object.values(goFeatures)]
-    : [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
+const javaFeatures = {
+  existingApp: `vis_existing_app_java_${now}`,
+  providers: `vis_provider_wrappers_java_${now}`,
+  otel: `vis_otel_java_${now}`,
+};
+
+const dotnetFeatures = {
+  existingApp: `vis_existing_app_dotnet_${now}`,
+  providers: `vis_provider_wrappers_dotnet_${now}`,
+  otel: `vis_otel_dotnet_${now}`,
+};
+
+function getAllFeatures(goEnabled, javaEnabled, dotnetEnabled) {
+  const features = [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
+  if (goEnabled) features.push(...Object.values(goFeatures));
+  if (javaEnabled) features.push(...Object.values(javaFeatures));
+  if (dotnetEnabled) features.push(...Object.values(dotnetFeatures));
+  return features;
 }
 
-function getLiveFeatures(goEnabled) {
-  return getAllFeatures(goEnabled).filter((feature) => !feature.includes("otel"));
+function getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled) {
+  return getAllFeatures(goEnabled, javaEnabled, dotnetEnabled).filter((feature) => !feature.includes("otel"));
 }
 
 const actionCenterFeatures = [
   nodeFeatures.autogen,
-  nodeFeatures.temporal,
   nodeFeatures.gateway,
   pythonFeatures.autogen,
-  pythonFeatures.temporal,
   pythonFeatures.gateway,
 ];
 
@@ -153,11 +167,28 @@ function hasLocalGoSdk() {
   return fs.existsSync(path.join(localGoSdkDir, "go.mod"));
 }
 
+function hasLocalJavaSdk() {
+  return fs.existsSync(path.join(localJavaSdkDir, "build.gradle.kts"));
+}
+
+function hasLocalDotnetSdk() {
+  return fs.existsSync(path.join(localDotnetSdkDir, "Tokvera.sln"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
     ...baseEnv,
     PYTHONPATH: [localPythonSdkDir, baseEnv.PYTHONPATH].filter(Boolean).join(path.delimiter),
+  };
+}
+
+function buildJavaEnv(baseEnv, javaHome) {
+  if (!javaHome) return { ...baseEnv };
+  return {
+    ...baseEnv,
+    JAVA_HOME: javaHome,
+    PATH: [path.join(javaHome, "bin"), baseEnv.PATH].filter(Boolean).join(path.delimiter),
   };
 }
 
@@ -199,6 +230,50 @@ async function resolveGoCommand() {
   }
 
   return null;
+}
+
+function getPortableJavaExecutableName() {
+  return process.platform === "win32" ? "java.exe" : "java";
+}
+
+function getGradleCommand() {
+  return process.platform === "win32" ? "gradlew.bat" : "./gradlew";
+}
+
+async function resolveJavaHome() {
+  const portableName = getPortableJavaExecutableName();
+  const candidates = [
+    process.env.TOKVERA_JAVA_HOME,
+    process.env.JAVA_HOME,
+    path.resolve(__dirname, "..", "..", "..", ".tools", "jdk-21.0.6+7"),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const javaBin = path.join(candidate, "bin", portableName);
+    if (!fs.existsSync(javaBin)) continue;
+    try {
+      await run(javaBin, ["-version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  try {
+    await run("java", ["-version"], { silent: true });
+    return "";
+  } catch {
+    return null;
+  }
+}
+
+async function resolveDotnetCommand() {
+  try {
+    await run("dotnet", ["--version"], { silent: true });
+    return "dotnet";
+  } catch {
+    return null;
+  }
 }
 
 async function resolvePythonCommand() {
@@ -259,7 +334,7 @@ async function fetchActionCenter() {
   );
 }
 
-async function emitRuntimeHelpers(go) {
+async function emitRuntimeHelpers(go, dotnet) {
   const sharedEnv = {
     ...process.env,
     TOKVERA_API_KEY: apiKey,
@@ -360,6 +435,84 @@ async function emitRuntimeHelpers(go) {
   } else {
     console.log("[runtime-visibility] skipping go traces (tokvera-go repo or go toolchain unavailable)");
   }
+
+  const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
+  const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
+  if (javaEnabled) {
+    const gradleCommand = getGradleCommand();
+    const javaEnv = {
+      ...buildJavaEnv(sharedEnv, javaHome),
+      TOKVERA_TENANT_ID: "tenant_demo_java",
+      TOKVERA_ENVIRONMENT: "prod",
+    };
+
+    console.log("[runtime-visibility] emitting java manual tracer traces");
+    await run(gradleCommand, ["--quiet", "runManualExample"], {
+      cwd: localJavaSdkDir,
+      env: {
+        ...javaEnv,
+        TOKVERA_FEATURE: javaFeatures.existingApp,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting java provider wrapper traces");
+    await run(gradleCommand, ["--quiet", "runProviderWrappersExample"], {
+      cwd: localJavaSdkDir,
+      env: {
+        ...javaEnv,
+        TOKVERA_FEATURE: javaFeatures.providers,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting java otel bridge traces");
+    await run(gradleCommand, ["--quiet", "runOtelBridgeExample"], {
+      cwd: localJavaSdkDir,
+      env: {
+        ...javaEnv,
+        TOKVERA_FEATURE: javaFeatures.otel,
+      },
+    });
+  } else {
+    console.log("[runtime-visibility] skipping java traces (tokvera-java repo or java toolchain unavailable)");
+  }
+
+  const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+  if (dotnetEnabled) {
+    const dotnetEnv = {
+      ...sharedEnv,
+      TOKVERA_TENANT_ID: "tenant_demo_dotnet",
+      TOKVERA_ENVIRONMENT: "prod",
+    };
+
+    console.log("[runtime-visibility] emitting dotnet manual tracer traces");
+    await run(dotnet, ["run", "--project", path.join("examples", "ManualTracer", "ManualTracer.csproj")], {
+      cwd: localDotnetSdkDir,
+      env: {
+        ...dotnetEnv,
+        TOKVERA_FEATURE: dotnetFeatures.existingApp,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting dotnet provider wrapper traces");
+    await run(dotnet, ["run", "--project", path.join("examples", "ProviderWrappers", "ProviderWrappers.csproj")], {
+      cwd: localDotnetSdkDir,
+      env: {
+        ...dotnetEnv,
+        TOKVERA_FEATURE: dotnetFeatures.providers,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting dotnet otel bridge traces");
+    await run(dotnet, ["run", "--project", path.join("examples", "OtelBridge", "OtelBridge.csproj")], {
+      cwd: localDotnetSdkDir,
+      env: {
+        ...dotnetEnv,
+        TOKVERA_FEATURE: dotnetFeatures.otel,
+      },
+    });
+  } else {
+    console.log("[runtime-visibility] skipping dotnet traces (tokvera-dotnet repo or dotnet toolchain unavailable)");
+  }
 }
 
 function getFeatureCounts(breakdown) {
@@ -372,9 +525,9 @@ function getFeatureCounts(breakdown) {
   }, {});
 }
 
-async function waitForVisibility(beforeOverviewRequests, goEnabled) {
-  const allFeatures = getAllFeatures(goEnabled);
-  const liveFeatures = getLiveFeatures(goEnabled);
+async function waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled) {
+  const allFeatures = getAllFeatures(goEnabled, javaEnabled, dotnetEnabled);
+  const liveFeatures = getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled);
   const started = Date.now();
   let lastState = null;
 
@@ -468,11 +621,15 @@ async function main() {
 
   const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
   const goEnabled = Boolean(go && hasLocalGoSdk());
+  const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
+  const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
+  const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
+  const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
 
-  await emitRuntimeHelpers(go);
+  await emitRuntimeHelpers(go, dotnet);
 
   console.log("[runtime-visibility] waiting for dashboard visibility across overview, traces, live, detail, inspector, and action center");
-  const state = await waitForVisibility(beforeOverviewRequests, goEnabled);
+  const state = await waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled);
 
   console.log("[runtime-visibility] success");
   console.log(
