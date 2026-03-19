@@ -166,6 +166,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable
   - Java and `.NET` now both pass local build/tests, canonical contract checks, shared smoke, integration soak, production lifecycle visibility, and dashboard visibility
 - [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
+  - PHP and Rust preview repos now exist with manual tracing, provider wrappers, OTel bridge, examples, tests, and CI workflows
+  - Wave 3 stays open until native toolchain validation, shared smoke/soak, production lifecycle visibility, and dashboard visibility all pass
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
 
 ### Commercial Readiness
@@ -222,6 +224,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - `tokvera-go`: Wave 1 Go SDK scaffold and qualification path
 - `tokvera-java`: Wave 2 Java SDK qualification path
 - `tokvera-dotnet`: Wave 2 .NET SDK qualification path
+- `tokvera-php`: Wave 3 PHP SDK preview and qualification path
+- `tokvera-rust`: Wave 3 Rust SDK preview and qualification path
 - `tokvera-dashboard`: operational UX, billing/tracing visibility, explainability
 - `tokvera-js` and `tokvera-python`: telemetry compatibility + gateway mode support
 - `tokvera-analytics-engine`: aggregation/detectors/savings scoring

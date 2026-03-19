@@ -118,6 +118,7 @@ Goal: defer gateway until Tokvera has 20 active paid tenants and a beginner-firs
   - each wave requires docs, examples, canonical contract, live lifecycle, and dashboard visibility parity before promotion
   - `tokvera-go` now clears the Wave 1 qualification bar; later language waves stay blocked until they meet the same gates
   - `tokvera-java` and `tokvera-dotnet` now both clear local build/tests, canonical contract, shared smoke/soak, production visibility, and dashboard visibility, so Wave 2 is closed
+  - `tokvera-php` and `tokvera-rust` are now started as Wave 3 preview repos with CI, examples, and contract checks, but Wave 3 stays open until the native toolchain and visibility gates pass
 
 ### Phase 3: Gateway Alpha (M5, starts only after Phase 2.9)
 

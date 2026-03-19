@@ -21,6 +21,8 @@ This repository is the public coordination and documentation entry point for the
 - `tokvera-go`: Go SDK
 - `tokvera-java`: Java SDK
 - `tokvera-dotnet`: .NET SDK
+- `tokvera-php`: PHP SDK
+- `tokvera-rust`: Rust SDK
 - `tokvera-api`: ingestion, auth, billing, traces, integrations API
 - `tokvera-dashboard`: app + docs + onboarding UX
 - `tokvera-analytics-engine`: async aggregation, budgets, anomalies
@@ -32,6 +34,8 @@ This repository is the public coordination and documentation entry point for the
 - Go: `tokvera-go` Wave 1 SDK with manual tracing, provider wrappers, OTel bridge, and live traces compatibility
 - Java: `tokvera-java` Wave 2 SDK with manual tracing, provider wrappers, OTel bridge, shared smoke/soak, and dashboard visibility coverage
 - .NET: `tokvera-dotnet` Wave 2 SDK with manual tracing, provider wrappers, OTel bridge, shared smoke/soak, and dashboard visibility coverage
+- PHP: `tokvera-php` Wave 3 preview scaffold with manual tracing, provider wrappers, OTel bridge, examples, tests, and CI workflows
+- Rust: `tokvera-rust` Wave 3 preview scaffold with manual tracing, provider wrappers, OTel bridge, examples, tests, and CI workflows
 
 ## Examples
 
@@ -90,6 +94,11 @@ Wave 2 is now qualified across Java and .NET:
 - canonical contract verification passes
 - shared smoke, soak, and production visibility now include Java and .NET
 - Java and .NET lifecycle rows and trace detail visibility pass in the dashboard
+
+Wave 3 preview work is now started for PHP and Rust:
+- `tokvera-php` and `tokvera-rust` both have real preview repos
+- each preview includes manual tracing, provider wrappers, OTel bridge, examples, tests, and canonical contract workflows
+- they remain preview-only until native toolchain validation, shared smoke/soak, and dashboard visibility gates are complete
 
 ## Operating Reports
 
