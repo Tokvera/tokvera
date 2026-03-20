@@ -99,6 +99,8 @@ Wave 3 preview work is now started for PHP and Rust:
 - `tokvera-php` and `tokvera-rust` both have real preview repos
 - each preview includes manual tracing, provider wrappers, OTel bridge, examples, tests, and canonical contract workflows
 - the shared `tokvera/test/sdk-examples` smoke, soak, and visibility runners now include those previews automatically when PHP or Rust toolchains are available
+- `tokvera/.github/workflows/sdk-shared-gates.yml` now installs PHP and Rust in CI and runs the shared smoke + soak gates across all SDK repos
+- `tokvera/.github/workflows/sdk-runtime-visibility.yml` is wired to close the production visibility gate once `TOKVERA_API_BASE_URL` and `TOKVERA_API_KEY` secrets are present
 - they remain preview-only until native toolchain validation, shared smoke/soak, and dashboard visibility gates are complete
 
 ## Operating Reports

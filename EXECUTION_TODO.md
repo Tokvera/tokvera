@@ -168,6 +168,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
   - PHP and Rust preview repos now exist with manual tracing, provider wrappers, OTel bridge, examples, tests, and CI workflows
   - Shared smoke, soak, and runtime visibility gates now know about PHP and Rust and will include them automatically when toolchains are available
+  - `tokvera/.github/workflows/sdk-shared-gates.yml` now installs PHP and Rust in CI and runs the shared smoke + soak gates across all SDK repos
+  - `tokvera/.github/workflows/sdk-runtime-visibility.yml` is ready to close production visibility once `TOKVERA_API_BASE_URL` and `TOKVERA_API_KEY` secrets are configured
   - Wave 3 stays open until native toolchain validation, shared smoke/soak, production lifecycle visibility, and dashboard visibility all pass
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
 

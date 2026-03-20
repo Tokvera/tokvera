@@ -1,0 +1,118 @@
+name: sdk-runtime-visibility
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 5 * * 4"
+
+jobs:
+  runtime-visibility:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TOKVERA_API_BASE_URL: ${{ secrets.TOKVERA_API_BASE_URL }}
+      TOKVERA_API_KEY: ${{ secrets.TOKVERA_API_KEY }}
+    steps:
+      - name: Check required secrets
+        run: |
+          test -n "$TOKVERA_API_BASE_URL" || { echo "TOKVERA_API_BASE_URL secret is required"; exit 1; }
+          test -n "$TOKVERA_API_KEY" || { echo "TOKVERA_API_KEY secret is required"; exit 1; }
+
+      - name: Checkout tokvera
+        uses: actions/checkout@v4
+        with:
+          path: tokvera
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-js
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-js
+          path: tokvera-js
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-python
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-python
+          path: tokvera-python
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-go
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-go
+          path: tokvera-go
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-java
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-java
+          path: tokvera-java
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-dotnet
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-dotnet
+          path: tokvera-dotnet
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-php
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-php
+          path: tokvera-php
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Checkout tokvera-rust
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-rust
+          path: tokvera-rust
+          token: ${{ secrets.TOKVERA_REPO_READ_TOKEN || github.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.1"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Ensure Java wrapper is executable
+        run: chmod +x ../tokvera-java/gradlew
+        working-directory: tokvera
+
+      - name: Run runtime visibility gate
+        run: node test/sdk-examples/run-runtime-helper-visibility.mjs
+        working-directory: tokvera
+
