@@ -12,7 +12,7 @@ There are two runners:
 - Runtime helper visibility (`run-runtime-helper-visibility.mjs`): emits existing-app/manual tracer, Mistral, OpenAI Agents, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces, then verifies overview/traces/live/detail/inspector/action-center visibility.
 - First paying-user flow (`run-first-paying-user-flow.mjs`): validates login, project/key provisioning, SDK ingestion, metrics, and billing metering.
 
-If a local sibling `../tokvera-go`, `../tokvera-java`, or `../tokvera-dotnet` checkout is present and the toolchain is available, the smoke and visibility runners include those SDKs automatically.
+If a local sibling `../tokvera-go`, `../tokvera-java`, `../tokvera-dotnet`, `../tokvera-php`, or `../tokvera-rust` checkout is present and the matching toolchain is available, the smoke and visibility runners include those SDKs automatically.
 
 ## Structure
 
@@ -38,7 +38,7 @@ Expected result:
 - Python example sends `chat.completions.create` and `responses.create` events.
 - Node runtime helper example emits manual tracer, Mistral, OpenAI Agents, LangGraph, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces.
 - Python runtime helper example emits manual tracer, Mistral, Claude Agent SDK, Google ADK, LangGraph, Instructor, PydanticAI, CrewAI, AutoGen, Mastra, Temporal, Pipecat, LiveKit, OpenAI-compatible gateway, and OTel bridge traces.
-- Local Go, Java, and .NET examples are also executed when their sibling repos and toolchains are available.
+- Local Go, Java, .NET, PHP, and Rust examples are also executed when their sibling repos and toolchains are available.
 - Current SDK examples also emit lifecycle start events so `/dashboard/traces/live` can show in-progress rows before terminal success/failure lands.
 - Both examples emit Trace Context v2 (`schema_version=2026-04-01`) with `trace_id`, `run_id`, `span_id`, `parent_span_id`, `step_name`.
 - Both examples include v2 diagnostics fields: `span_kind`, `metrics`, `decision`, and `payload_blocks`.
@@ -66,7 +66,7 @@ export TOKVERA_SOAK_ROUNDS="2"
 Expected result:
 
 - Repeats the full runtime-helper matrix for Node and Python.
-- Repeats the local Go, Java, and .NET matrices when those repos/toolchains are available.
+- Repeats the local Go, Java, .NET, PHP, and Rust matrices when those repos/toolchains are available.
 - Verifies there are no duplicate `(trace_id, span_id, status)` emissions.
 - Verifies lifecycle pairs are complete (`in_progress -> success|failure`) for lifecycle-enabled spans.
 - Allows success-only spans for OTel bridge coverage.
@@ -156,7 +156,7 @@ Operational notes:
 - This gate assumes the target project key belongs to a plan with Trace Explorer and Action Center entitlements.
 - If a local sibling `../tokvera-python` checkout is present, the script uses it automatically so unreleased Python helper surfaces can still be validated.
 - If a local sibling `../tokvera-js` checkout is present, the script builds and installs it into the node example so unreleased JS helper surfaces can still be validated.
-- If local sibling `../tokvera-go`, `../tokvera-java`, or `../tokvera-dotnet` checkouts are present and the toolchain is available, the script runs those preview SDK examples as part of the same visibility gate.
+- If local sibling `../tokvera-go`, `../tokvera-java`, `../tokvera-dotnet`, `../tokvera-php`, or `../tokvera-rust` checkouts are present and the toolchain is available, the script runs those preview SDK examples as part of the same visibility gate.
 - The runner uses a broad metrics window for overview/breakdown checks and a short current-run window for Action Center so global top-N ranking does not hide the newly emitted helper batch.
 
 ## Run First Paying-User Flow Smoke

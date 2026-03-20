@@ -14,6 +14,8 @@ const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-pyt
 const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
 const localJavaSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-java");
 const localDotnetSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-dotnet");
+const localPhpSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-php");
+const localRustSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-rust");
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const baseUrl = (process.env.TOKVERA_API_BASE_URL || "https://api.tokvera.org").replace(/\/$/, "");
@@ -82,16 +84,30 @@ const dotnetFeatures = {
   otel: `vis_otel_dotnet_${now}`,
 };
 
-function getAllFeatures(goEnabled, javaEnabled, dotnetEnabled) {
+const phpFeatures = {
+  existingApp: `vis_existing_app_php_${now}`,
+  providers: `vis_provider_wrappers_php_${now}`,
+  otel: `vis_otel_php_${now}`,
+};
+
+const rustFeatures = {
+  existingApp: `vis_existing_app_rust_${now}`,
+  providers: `vis_provider_wrappers_rust_${now}`,
+  otel: `vis_otel_rust_${now}`,
+};
+
+function getAllFeatures(goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled) {
   const features = [...Object.values(nodeFeatures), ...Object.values(pythonFeatures)];
   if (goEnabled) features.push(...Object.values(goFeatures));
   if (javaEnabled) features.push(...Object.values(javaFeatures));
   if (dotnetEnabled) features.push(...Object.values(dotnetFeatures));
+  if (phpEnabled) features.push(...Object.values(phpFeatures));
+  if (rustEnabled) features.push(...Object.values(rustFeatures));
   return features;
 }
 
-function getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled) {
-  return getAllFeatures(goEnabled, javaEnabled, dotnetEnabled).filter((feature) => !feature.includes("otel"));
+function getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled) {
+  return getAllFeatures(goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled).filter((feature) => !feature.includes("otel"));
 }
 
 const actionCenterFeatures = [
@@ -175,6 +191,14 @@ function hasLocalDotnetSdk() {
   return fs.existsSync(path.join(localDotnetSdkDir, "Tokvera.sln"));
 }
 
+function hasLocalPhpSdk() {
+  return fs.existsSync(path.join(localPhpSdkDir, "composer.json"));
+}
+
+function hasLocalRustSdk() {
+  return fs.existsSync(path.join(localRustSdkDir, "Cargo.toml"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
@@ -201,14 +225,33 @@ async function installNodeExampleDependencies() {
   console.log(`[runtime-visibility] building local js sdk from ${localNodeSdkDir}`);
   await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
 
+  console.log("[runtime-visibility] packing local js sdk tarball");
+  const packResult = await run(npmCommand, ["pack", "--silent"], { cwd: localNodeSdkDir });
+  const tarballName = packResult.stdout
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .pop();
+
+  if (!tarballName) {
+    throw new Error("npm pack did not return a tarball name for the local js sdk");
+  }
+
+  const tarballPath = path.join(localNodeSdkDir, tarballName);
+
   console.log("[runtime-visibility] overriding node example with local js sdk checkout");
   fs.rmSync(path.join(nodeExampleDir, "node_modules", "@tokvera", "sdk"), {
     recursive: true,
     force: true,
   });
-  await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
-    cwd: nodeExampleDir,
-  });
+  try {
+    await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", tarballPath], {
+      cwd: nodeExampleDir,
+    });
+  } finally {
+    fs.rmSync(tarballPath, { force: true });
+  }
 }
 
 async function resolveGoCommand() {
@@ -276,6 +319,32 @@ async function resolveDotnetCommand() {
   }
 }
 
+async function resolvePhpCommand() {
+  const candidates = [process.env.TOKVERA_PHP_BIN, "php"].filter(Boolean);
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["-v"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+  return null;
+}
+
+async function resolveCargoCommand() {
+  const candidates = [process.env.TOKVERA_CARGO_BIN, "cargo"].filter(Boolean);
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["--version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+  return null;
+}
+
 async function resolvePythonCommand() {
   const candidates = [
     { command: "python", prefix: [] },
@@ -339,6 +408,7 @@ async function emitRuntimeHelpers(go, dotnet) {
     ...process.env,
     TOKVERA_API_KEY: apiKey,
     TOKVERA_INGEST_URL: process.env.TOKVERA_INGEST_URL || `${baseUrl}/v1/events`,
+    TOKVERA_API_BASE_URL: baseUrl,
     TOKVERA_WAIT_MS: process.env.TOKVERA_WAIT_MS || "1800",
     TOKVERA_WAIT_SECONDS: process.env.TOKVERA_WAIT_SECONDS || "4",
   };
@@ -513,6 +583,84 @@ async function emitRuntimeHelpers(go, dotnet) {
   } else {
     console.log("[runtime-visibility] skipping dotnet traces (tokvera-dotnet repo or dotnet toolchain unavailable)");
   }
+
+  const php = hasLocalPhpSdk() ? await resolvePhpCommand() : null;
+  const phpEnabled = Boolean(php && hasLocalPhpSdk());
+  if (phpEnabled) {
+    const phpEnv = {
+      ...sharedEnv,
+      TOKVERA_TENANT_ID: "tenant_demo_php",
+      TOKVERA_ENVIRONMENT: "prod",
+    };
+
+    console.log("[runtime-visibility] emitting php manual tracer traces");
+    await run(php, [path.join("examples", "manual_tracer.php")], {
+      cwd: localPhpSdkDir,
+      env: {
+        ...phpEnv,
+        TOKVERA_FEATURE: phpFeatures.existingApp,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting php provider wrapper traces");
+    await run(php, [path.join("examples", "provider_wrappers.php")], {
+      cwd: localPhpSdkDir,
+      env: {
+        ...phpEnv,
+        TOKVERA_FEATURE: phpFeatures.providers,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting php otel bridge traces");
+    await run(php, [path.join("examples", "otel_bridge.php")], {
+      cwd: localPhpSdkDir,
+      env: {
+        ...phpEnv,
+        TOKVERA_FEATURE: phpFeatures.otel,
+      },
+    });
+  } else {
+    console.log("[runtime-visibility] skipping php traces (tokvera-php repo or php toolchain unavailable)");
+  }
+
+  const cargo = hasLocalRustSdk() ? await resolveCargoCommand() : null;
+  const rustEnabled = Boolean(cargo && hasLocalRustSdk());
+  if (rustEnabled) {
+    const rustEnv = {
+      ...sharedEnv,
+      TOKVERA_TENANT_ID: "tenant_demo_rust",
+      TOKVERA_ENVIRONMENT: "prod",
+    };
+
+    console.log("[runtime-visibility] emitting rust manual tracer traces");
+    await run(cargo, ["run", "--example", "manual_tracer"], {
+      cwd: localRustSdkDir,
+      env: {
+        ...rustEnv,
+        TOKVERA_FEATURE: rustFeatures.existingApp,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting rust provider wrapper traces");
+    await run(cargo, ["run", "--example", "provider_wrappers"], {
+      cwd: localRustSdkDir,
+      env: {
+        ...rustEnv,
+        TOKVERA_FEATURE: rustFeatures.providers,
+      },
+    });
+
+    console.log("[runtime-visibility] emitting rust otel bridge traces");
+    await run(cargo, ["run", "--example", "otel_bridge"], {
+      cwd: localRustSdkDir,
+      env: {
+        ...rustEnv,
+        TOKVERA_FEATURE: rustFeatures.otel,
+      },
+    });
+  } else {
+    console.log("[runtime-visibility] skipping rust traces (tokvera-rust repo or rust toolchain unavailable)");
+  }
 }
 
 function getFeatureCounts(breakdown) {
@@ -525,9 +673,9 @@ function getFeatureCounts(breakdown) {
   }, {});
 }
 
-async function waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled) {
-  const allFeatures = getAllFeatures(goEnabled, javaEnabled, dotnetEnabled);
-  const liveFeatures = getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled);
+async function waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled) {
+  const allFeatures = getAllFeatures(goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled);
+  const liveFeatures = getLiveFeatures(goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled);
   const started = Date.now();
   let lastState = null;
 
@@ -625,11 +773,15 @@ async function main() {
   const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
   const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
   const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+  const php = hasLocalPhpSdk() ? await resolvePhpCommand() : null;
+  const phpEnabled = Boolean(php && hasLocalPhpSdk());
+  const cargo = hasLocalRustSdk() ? await resolveCargoCommand() : null;
+  const rustEnabled = Boolean(cargo && hasLocalRustSdk());
 
   await emitRuntimeHelpers(go, dotnet);
 
   console.log("[runtime-visibility] waiting for dashboard visibility across overview, traces, live, detail, inspector, and action center");
-  const state = await waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled);
+  const state = await waitForVisibility(beforeOverviewRequests, goEnabled, javaEnabled, dotnetEnabled, phpEnabled, rustEnabled);
 
   console.log("[runtime-visibility] success");
   console.log(

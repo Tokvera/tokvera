@@ -14,6 +14,8 @@ const localPythonSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-pyt
 const localGoSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-go");
 const localJavaSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-java");
 const localDotnetSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-dotnet");
+const localPhpSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-php");
+const localRustSdkDir = path.resolve(__dirname, "..", "..", "..", "tokvera-rust");
 
 const mockPort = Number(process.env.MOCK_INGEST_PORT || 8788);
 const ingestUrl = `http://127.0.0.1:${mockPort}/v1/events`;
@@ -25,6 +27,7 @@ const soakRounds = Number(process.env.TOKVERA_SOAK_ROUNDS || 2);
 const sharedEnv = {
   ...process.env,
   TOKVERA_INGEST_URL: ingestUrl,
+  TOKVERA_API_BASE_URL: process.env.TOKVERA_API_BASE_URL || `http://127.0.0.1:${mockPort}`,
   TOKVERA_API_KEY: process.env.TOKVERA_API_KEY || "tokvera_project_key",
   TOKVERA_WAIT_MS: process.env.TOKVERA_WAIT_MS || "1200",
   TOKVERA_WAIT_SECONDS: process.env.TOKVERA_WAIT_SECONDS || "4",
@@ -98,6 +101,14 @@ function hasLocalDotnetSdk() {
   return fs.existsSync(path.join(localDotnetSdkDir, "Tokvera.sln"));
 }
 
+function hasLocalPhpSdk() {
+  return fs.existsSync(path.join(localPhpSdkDir, "composer.json"));
+}
+
+function hasLocalRustSdk() {
+  return fs.existsSync(path.join(localRustSdkDir, "Cargo.toml"));
+}
+
 function buildPythonEnv(baseEnv) {
   if (!hasLocalPythonSdk()) return { ...baseEnv };
   return {
@@ -137,13 +148,32 @@ async function installNodeExampleDependencies() {
   await run(npmCommand, ["install", "--no-audit", "--no-fund"], { cwd: nodeExampleDir });
   if (!hasLocalNodeSdk()) return;
   await run(npmCommand, ["run", "build"], { cwd: localNodeSdkDir });
+
+  const packResult = await run(npmCommand, ["pack", "--silent"], { cwd: localNodeSdkDir });
+  const tarballName = packResult.stdout
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .pop();
+
+  if (!tarballName) {
+    throw new Error("npm pack did not return a tarball name for the local js sdk");
+  }
+
+  const tarballPath = path.join(localNodeSdkDir, tarballName);
+
   fs.rmSync(path.join(nodeExampleDir, "node_modules", "@tokvera", "sdk"), {
     recursive: true,
     force: true,
   });
-  await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", localNodeSdkDir], {
-    cwd: nodeExampleDir,
-  });
+  try {
+    await run(npmCommand, ["install", "--no-audit", "--no-fund", "--no-save", tarballPath], {
+      cwd: nodeExampleDir,
+    });
+  } finally {
+    fs.rmSync(tarballPath, { force: true });
+  }
 }
 
 async function resolveGoCommand() {
@@ -211,6 +241,32 @@ async function resolveDotnetCommand() {
   }
 }
 
+async function resolvePhpCommand() {
+  const candidates = [process.env.TOKVERA_PHP_BIN, "php"].filter(Boolean);
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["-v"], { silent: true });
+      return candidate;
+    } catch {
+      // try next
+    }
+  }
+  return null;
+}
+
+async function resolveCargoCommand() {
+  const candidates = [process.env.TOKVERA_CARGO_BIN, "cargo"].filter(Boolean);
+  for (const candidate of candidates) {
+    try {
+      await run(candidate, ["--version"], { silent: true });
+      return candidate;
+    } catch {
+      // try next
+    }
+  }
+  return null;
+}
+
 function buildFeatureEnv(round) {
   return {
     TOKVERA_FEATURE_EXISTING_APP_JS: `soak_existing_app_js_${round}`,
@@ -248,6 +304,12 @@ function buildFeatureEnv(round) {
     TOKVERA_FEATURE_EXISTING_APP_DOTNET: `soak_existing_app_dotnet_${round}`,
     TOKVERA_FEATURE_PROVIDERS_DOTNET: `soak_provider_wrappers_dotnet_${round}`,
     TOKVERA_FEATURE_OTEL_DOTNET: `soak_otel_dotnet_${round}`,
+    TOKVERA_FEATURE_EXISTING_APP_PHP: `soak_existing_app_php_${round}`,
+    TOKVERA_FEATURE_PROVIDERS_PHP: `soak_provider_wrappers_php_${round}`,
+    TOKVERA_FEATURE_OTEL_PHP: `soak_otel_php_${round}`,
+    TOKVERA_FEATURE_EXISTING_APP_RUST: `soak_existing_app_rust_${round}`,
+    TOKVERA_FEATURE_PROVIDERS_RUST: `soak_provider_wrappers_rust_${round}`,
+    TOKVERA_FEATURE_OTEL_RUST: `soak_otel_rust_${round}`,
   };
 }
 
@@ -342,6 +404,10 @@ async function main() {
     const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
     const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
     const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+    const php = hasLocalPhpSdk() ? await resolvePhpCommand() : null;
+    const phpEnabled = Boolean(php && hasLocalPhpSdk());
+    const cargo = hasLocalRustSdk() ? await resolveCargoCommand() : null;
+    const rustEnabled = Boolean(cargo && hasLocalRustSdk());
     const gradleCommand = getGradleCommand();
     const javaEnvBase = buildJavaEnv(sharedEnv, javaHome);
 
@@ -465,6 +531,76 @@ async function main() {
             ...sharedEnv,
             TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_DOTNET,
             TOKVERA_TENANT_ID: "tenant_demo_dotnet",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+      }
+
+      if (phpEnabled) {
+        console.log(`[soak] round ${round}/${soakRounds}: php manual tracer`);
+        await run(php, [path.join("examples", "manual_tracer.php")], {
+          cwd: localPhpSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_EXISTING_APP_PHP,
+            TOKVERA_TENANT_ID: "tenant_demo_php",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: php provider wrappers`);
+        await run(php, [path.join("examples", "provider_wrappers.php")], {
+          cwd: localPhpSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_PROVIDERS_PHP,
+            TOKVERA_TENANT_ID: "tenant_demo_php",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: php otel bridge`);
+        await run(php, [path.join("examples", "otel_bridge.php")], {
+          cwd: localPhpSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_PHP,
+            TOKVERA_TENANT_ID: "tenant_demo_php",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+      }
+
+      if (rustEnabled) {
+        console.log(`[soak] round ${round}/${soakRounds}: rust manual tracer`);
+        await run(cargo, ["run", "--example", "manual_tracer"], {
+          cwd: localRustSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_EXISTING_APP_RUST,
+            TOKVERA_TENANT_ID: "tenant_demo_rust",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: rust provider wrappers`);
+        await run(cargo, ["run", "--example", "provider_wrappers"], {
+          cwd: localRustSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_PROVIDERS_RUST,
+            TOKVERA_TENANT_ID: "tenant_demo_rust",
+            TOKVERA_ENVIRONMENT: "soak",
+          },
+        });
+
+        console.log(`[soak] round ${round}/${soakRounds}: rust otel bridge`);
+        await run(cargo, ["run", "--example", "otel_bridge"], {
+          cwd: localRustSdkDir,
+          env: {
+            ...sharedEnv,
+            TOKVERA_FEATURE: featureEnv.TOKVERA_FEATURE_OTEL_RUST,
+            TOKVERA_TENANT_ID: "tenant_demo_rust",
             TOKVERA_ENVIRONMENT: "soak",
           },
         });

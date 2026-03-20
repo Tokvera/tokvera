@@ -98,6 +98,7 @@ Wave 2 is now qualified across Java and .NET:
 Wave 3 preview work is now started for PHP and Rust:
 - `tokvera-php` and `tokvera-rust` both have real preview repos
 - each preview includes manual tracing, provider wrappers, OTel bridge, examples, tests, and canonical contract workflows
+- the shared `tokvera/test/sdk-examples` smoke, soak, and visibility runners now include those previews automatically when PHP or Rust toolchains are available
 - they remain preview-only until native toolchain validation, shared smoke/soak, and dashboard visibility gates are complete
 
 ## Operating Reports
