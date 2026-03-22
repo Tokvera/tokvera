@@ -22,6 +22,11 @@ const baseUrl = (process.env.TOKVERA_API_BASE_URL || "https://api.tokvera.org").
 const apiKey = process.env.TOKVERA_API_KEY;
 const visibilityTimeoutMs = Number(process.env.SMOKE_VISIBILITY_TIMEOUT_SECONDS || 120) * 1000;
 const pollIntervalMs = Number(process.env.SMOKE_VISIBILITY_POLL_SECONDS || 5) * 1000;
+const enableGo = process.env.TOKVERA_VISIBILITY_ENABLE_GO !== "0";
+const enableJava = process.env.TOKVERA_VISIBILITY_ENABLE_JAVA !== "0";
+const enableDotnet = process.env.TOKVERA_VISIBILITY_ENABLE_DOTNET !== "0";
+const enablePhp = process.env.TOKVERA_VISIBILITY_ENABLE_PHP !== "0";
+const enableRust = process.env.TOKVERA_VISIBILITY_ENABLE_RUST !== "0";
 
 if (!apiKey) {
   console.error("[runtime-visibility] TOKVERA_API_KEY is required");
@@ -469,7 +474,7 @@ async function emitRuntimeHelpers(go, dotnet) {
     env: pythonEnv,
   });
 
-  if (hasLocalGoSdk() && go) {
+  if (enableGo && hasLocalGoSdk() && go) {
     console.log("[runtime-visibility] emitting go manual tracer traces");
     await run(go, ["run", "./examples/manual_tracer"], {
       cwd: localGoSdkDir,
@@ -506,8 +511,8 @@ async function emitRuntimeHelpers(go, dotnet) {
     console.log("[runtime-visibility] skipping go traces (tokvera-go repo or go toolchain unavailable)");
   }
 
-  const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
-  const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
+  const javaHome = enableJava && hasLocalJavaSdk() ? await resolveJavaHome() : null;
+  const javaEnabled = enableJava && hasLocalJavaSdk() && javaHome !== null;
   if (javaEnabled) {
     const gradleCommand = getGradleCommand();
     const javaEnv = {
@@ -546,7 +551,7 @@ async function emitRuntimeHelpers(go, dotnet) {
     console.log("[runtime-visibility] skipping java traces (tokvera-java repo or java toolchain unavailable)");
   }
 
-  const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
+  const dotnetEnabled = enableDotnet && Boolean(dotnet && hasLocalDotnetSdk());
   if (dotnetEnabled) {
     const dotnetEnv = {
       ...sharedEnv,
@@ -585,7 +590,7 @@ async function emitRuntimeHelpers(go, dotnet) {
   }
 
   const php = hasLocalPhpSdk() ? await resolvePhpCommand() : null;
-  const phpEnabled = Boolean(php && hasLocalPhpSdk());
+  const phpEnabled = enablePhp && Boolean(php && hasLocalPhpSdk());
   if (phpEnabled) {
     const phpEnv = {
       ...sharedEnv,
@@ -624,7 +629,7 @@ async function emitRuntimeHelpers(go, dotnet) {
   }
 
   const cargo = hasLocalRustSdk() ? await resolveCargoCommand() : null;
-  const rustEnabled = Boolean(cargo && hasLocalRustSdk());
+  const rustEnabled = enableRust && Boolean(cargo && hasLocalRustSdk());
   if (rustEnabled) {
     const rustEnv = {
       ...sharedEnv,
@@ -767,16 +772,16 @@ async function main() {
   );
   console.log(`[runtime-visibility] overview before=${beforeOverviewRequests}`);
 
-  const go = hasLocalGoSdk() ? await resolveGoCommand() : null;
-  const goEnabled = Boolean(go && hasLocalGoSdk());
-  const javaHome = hasLocalJavaSdk() ? await resolveJavaHome() : null;
-  const javaEnabled = hasLocalJavaSdk() && javaHome !== null;
-  const dotnet = hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
-  const dotnetEnabled = Boolean(dotnet && hasLocalDotnetSdk());
-  const php = hasLocalPhpSdk() ? await resolvePhpCommand() : null;
-  const phpEnabled = Boolean(php && hasLocalPhpSdk());
-  const cargo = hasLocalRustSdk() ? await resolveCargoCommand() : null;
-  const rustEnabled = Boolean(cargo && hasLocalRustSdk());
+  const go = enableGo && hasLocalGoSdk() ? await resolveGoCommand() : null;
+  const goEnabled = enableGo && Boolean(go && hasLocalGoSdk());
+  const javaHome = enableJava && hasLocalJavaSdk() ? await resolveJavaHome() : null;
+  const javaEnabled = enableJava && hasLocalJavaSdk() && javaHome !== null;
+  const dotnet = enableDotnet && hasLocalDotnetSdk() ? await resolveDotnetCommand() : null;
+  const dotnetEnabled = enableDotnet && Boolean(dotnet && hasLocalDotnetSdk());
+  const php = enablePhp && hasLocalPhpSdk() ? await resolvePhpCommand() : null;
+  const phpEnabled = enablePhp && Boolean(php && hasLocalPhpSdk());
+  const cargo = enableRust && hasLocalRustSdk() ? await resolveCargoCommand() : null;
+  const rustEnabled = enableRust && Boolean(cargo && hasLocalRustSdk());
 
   await emitRuntimeHelpers(go, dotnet);
 
