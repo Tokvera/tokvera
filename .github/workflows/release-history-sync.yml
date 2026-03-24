@@ -1,0 +1,76 @@
+name: release-history-sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "release-evidence/**"
+      - ".github/workflows/release-history-sync.yml"
+      - "test/sync-dashboard-release-history.mjs"
+
+jobs:
+  sync-dashboard-release-history:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tokvera
+        uses: actions/checkout@v4
+        with:
+          path: tokvera
+
+      - name: Checkout tokvera-dashboard
+        uses: actions/checkout@v4
+        with:
+          repository: Tokvera/tokvera-dashboard
+          path: tokvera-dashboard
+          token: ${{ secrets.TOKVERA_REPO_SYNC_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dashboard dependencies
+        working-directory: tokvera-dashboard
+        run: pnpm install --frozen-lockfile
+
+      - name: Refresh dashboard release history
+        working-directory: tokvera
+        env:
+          TOKVERA_DASHBOARD_DIR: ../tokvera-dashboard
+          TOKVERA_RELEASE_EVIDENCE_DIR: ./release-evidence
+        run: node test/sync-dashboard-release-history.mjs
+
+      - name: Check for dashboard changes
+        id: dashboard_changes
+        working-directory: tokvera-dashboard
+        shell: bash
+        run: |
+          if [[ -n "$(git status --short)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit dashboard release history update
+        if: steps.dashboard_changes.outputs.changed == 'true'
+        working-directory: tokvera-dashboard
+        shell: bash
+        run: |
+          git config user.name "tokvera-release-sync[bot]"
+          git config user.email "tokvera-release-sync@users.noreply.github.com"
+          git add content/generated-release-events.json lib/release-content.ts
+          git commit -m "sync release history from tokvera evidence [skip ci]"
+
+      - name: Push dashboard release history update
+        if: steps.dashboard_changes.outputs.changed == 'true'
+        working-directory: tokvera-dashboard
+        run: git push origin HEAD:main
