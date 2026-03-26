@@ -62,6 +62,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Billing page consumes summary/metering/invoice/retention
 - [x] Billing page shows entitlements + billing health panels
 - [x] Add explicit blocked-state UX (`402` contract mapping for user-friendly CTAs)
+- [x] Add team seat-limit visibility to billing and settings
 
 ### Exit Criteria for M4
 - [ ] One tenant active on paid plan for full 7-day operating window
@@ -147,12 +148,24 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add persistent beginner guidance on core dashboard pages
 - [x] Strengthen integration chooser flows in home page, integrations page, docs quickstart, tracing setup workspace, and API Keys setup
 - [x] Add guided setup variants for existing app, multi-model, provider-wrapper-first, framework, and agent-runtime teams
+- [x] Add basic team collaboration for paying tenants:
+  - owner/admin invite, resend, revoke, and remove flows
+  - free plan restricted to solo access by default
+  - paid tiers enforce seat caps by entitlement
+  - upgrade prompts when the seat limit is reached
+  - one verified user can join multiple workspaces and switch active workspace
+  - workspace roles ship before gateway: owner, admin, member, viewer, finance
+  - project-scoped access controls follow the workspace-role rollout for non-admin users
 
 ### Documentation and Acquisition Content
 - [x] Maintain canonical docs tracks for quickstart, existing app/manual tracing, multi-model tracing, live tracing, trace debugging, billing/ops, and integration matrix
 - [ ] Ship 2 practical blog posts every sprint
 - [x] Add comparison and acquisition pages for Tokvera vs LangSmith, Tokvera vs generic dashboards, and SaaS app teams
 - [x] Keep marketing, docs, and dashboard setup content on one shared integration/content model
+- [x] Add public `/announcements` page with chronological archive and stable detail routes
+- [x] Add public `/changelog` page with chronological archive and stable detail routes
+- [x] Add SEO-ready detail pages for SDK releases, feature launches, and milestone completions with backlinks to docs, integrations, and related product pages
+- [x] Hook release evidence / milestone completion into announcement + changelog generation so those pages update consistently after meaningful ship events
 
 ### E2E, Smoke, and Release Gates
 - [x] Add product-path Playwright coverage for onboarding, traces/live traces, trace detail, API key setup, and docs/integration navigation
@@ -165,12 +178,10 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
   - Go CI, canonical contract checks, local smoke/soak, production lifecycle visibility, and dashboard visibility now pass
 - [x] Wave 2: ship `tokvera-java` and `tokvera-dotnet` with the same parity bar after Go is stable
   - Java and `.NET` now both pass local build/tests, canonical contract checks, shared smoke, integration soak, production lifecycle visibility, and dashboard visibility
-- [ ] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
-  - PHP and Rust preview repos now exist with manual tracing, provider wrappers, OTel bridge, examples, tests, and CI workflows
-  - Shared smoke, soak, and runtime visibility gates now know about PHP and Rust and will include them automatically when toolchains are available
-  - `tokvera/.github/workflows/sdk-shared-gates.yml` now installs PHP and Rust in CI and runs the shared smoke + soak gates across all SDK repos
-  - `tokvera/.github/workflows/sdk-runtime-visibility.yml` is ready to close production visibility once `TOKVERA_API_BASE_URL` and `TOKVERA_API_KEY` secrets are configured
-  - Wave 3 stays open until native toolchain validation, shared smoke/soak, production lifecycle visibility, and dashboard visibility all pass
+- [x] Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable
+  - PHP and Rust now both pass local/native tests, canonical contract checks, shared smoke, integration soak, production lifecycle visibility, and dashboard visibility
+  - `tokvera/.github/workflows/sdk-shared-gates.yml` installs PHP and Rust in CI and runs the shared smoke + soak gates across all SDK repos
+  - `tokvera/.github/workflows/sdk-runtime-visibility.yml` keeps production lifecycle visibility wired through the shared gate path
 - [ ] Do not promote any new language SDK to official until docs, examples, canonical contract, lifecycle/live traces, and dashboard visibility all pass
 
 ### Commercial Readiness
@@ -178,6 +189,15 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add sample apps, template repos, and "verify in live traces" checklists for acquisition
 - [x] Keep weekly operating-window evidence and billing reliability review in place while paid tenant count grows
 - [x] Generate automated report for 20 active paid tenants gate
+- [x] Track team adoption metrics alongside paid conversion:
+  - tenants with 2+ members
+  - invite acceptance rate
+  - seat-cap upgrade pressure by plan
+- [x] Add customer usage intelligence for SaaS builders before gateway:
+  - first-class usage dimensions for `customer_id`, `end_user_id`, `organization_id`, and optional `credit_bucket`
+  - customer-wise token/cost rollups in dashboard and export APIs
+  - webhook delivery for usage sync, credit decrement triggers, and threshold alerts
+  - finance/reporting flows for reconciliation and top-customer cost review
 
 ## Phase D (Gateway Alpha / M5) - starts only after M4.8
 
@@ -207,6 +227,34 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [ ] Churn/upgrade review loop based on usage + billing signals
 - [ ] Sustain 20 active SaaS users
 - [ ] Reach $10k MRR
+
+## Team / Seat Management Scope (pre-enterprise)
+
+- [x] Add `teams`, `team_members`, and `team_invitations` data model support
+- [x] Add `tenant_memberships` so one verified user can belong to multiple workspaces
+- [x] Add owner/admin-only invite and removal API
+- [x] Add workspace switcher support in the dashboard session model
+- [x] Add workspace roles: `owner`, `admin`, `member`, `viewer`, `finance`
+- [x] Add project-scoped access policies for `member`, `viewer`, and `finance` roles
+- [x] Enforce team seat caps through billing entitlements
+- [x] Free plan: 1 member by default
+- [x] Paid plans: capped members by tier
+- [ ] Enterprise/custom plans: configurable seat allowance
+- [x] Add Team settings page with invite, resend, revoke, and remove actions
+- [x] Add invite email flow and acceptance path
+- [x] Add finance role views for invoices, usage totals, customer rollups, and exports without API-key or raw-payload admin access
+- [ ] Add E2E coverage for invite, accept, over-seat rejection, and upgrade CTA
+- [x] Add docs for team management, seat limits, and admin responsibilities
+
+## Customer Usage / Webhooks / Reporting
+
+- [x] Add first-class event dimensions for `customer_id`, `end_user_id`, `organization_id`, and optional `credit_bucket`
+- [ ] Keep metadata support for extra context, but do not depend on free-form metadata for billing-grade aggregation
+- [x] Add customer-wise token/cost read models and export-ready aggregates
+- [x] Add `GET /v1/usage/customers` and detail/export surfaces for customer usage reconciliation
+- [x] Add customer usage webhook events for usage sync, credit decrement, quota reached, and threshold alerts
+- [ ] Add docs/examples for SaaS builders to mirror Tokvera usage into their own customer credit systems
+- [ ] Add contract tests and E2E coverage for customer-usage APIs and webhook delivery
 
 ## Release Checklist Template (use each 2-week cycle)
 

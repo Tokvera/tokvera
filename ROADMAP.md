@@ -22,6 +22,12 @@ Execution priority before gateway: broaden integration coverage, improve beginne
 - Add first-event onboarding wizard with SDK setup snippets and live verification
 - Add baseline trace context support (`trace_id`, `span_id`, `parent_span_id`)
 - Add Action Center v1 (cost spikes, noisy workflows, abnormal customer spend, repeated trace failures, monthly overrun projection, routing opportunities)
+- Add basic team management:
+  - owner/admin invite and remove flows
+  - tenant-wide membership model in the initial release
+  - free plan defaults to solo use
+  - paid plans enforce seat caps via entitlements
+  - same verified user can belong to multiple workspaces and switch active workspace
 
 ### Phase 2.25: Canonical Telemetry Foundation
 
@@ -106,6 +112,36 @@ Goal: defer gateway until Tokvera has 20 active paid tenants and a beginner-firs
   - stack chooser guides
   - existing-app and multi-model docs tracks
   - practical blog cadence
+  - announcement center with historical archive
+  - changelog with historical archive
+  - release-note detail pages for SDK releases, feature launches, and milestone completions
+  - SEO/backlink-ready release pages with canonical metadata, internal backlinks, and related docs links
+  - release communication hook so milestone/release completion updates announcement + changelog surfaces regularly
+- Add team collaboration that matches SaaS buyer expectations before gateway:
+  - Team settings page
+  - invite, resend, revoke, and remove flows for owner/admin users
+  - multi-workspace membership and workspace switcher
+  - workspace roles:
+    - `owner`
+    - `admin`
+    - `member`
+    - `viewer`
+    - `finance`
+  - project-scoped access controls for non-admin roles
+  - seat usage visibility in billing and settings
+  - upgrade CTA when a team reaches its plan cap
+  - default seat policy:
+    - Free: 1 member
+    - paid tiers: capped seat counts by plan
+    - enterprise/custom: negotiated seat allowance
+- Add customer usage intelligence for SaaS builders before gateway:
+  - first-class usage dimensions for `customer_id`, `end_user_id`, `organization_id`, and optional `credit_bucket`
+  - customer-wise token/cost rollups in dashboard and exports
+  - webhook delivery for usage sync, credit decrement triggers, and threshold alerts
+  - API access for reconciliation, reporting, and backfill flows
+- Add finance and ops-friendly access patterns before gateway:
+  - `finance` role for invoices, usage totals, customer rollups, and exports
+  - finance users do not create API keys or inspect raw prompt/payload content by default
 - Expand product-path quality gates:
   - onboarding E2E
   - live tracing E2E
@@ -142,6 +178,37 @@ Goal: defer gateway until Tokvera has 20 active paid tenants and a beginner-firs
 - Move from recommendation to controlled automation
 - Expand tenant adoption and retention loops
 - Reach M7 and M8 commercial targets
+
+## Access Model Before Enterprise RBAC
+
+- Ship multi-workspace access and role-based collaboration before SSO/RBAC because shared workspace access is a core SaaS expectation.
+- Scope before gateway:
+  - owner/admin invite, resend, revoke, and removal
+  - one user can belong to multiple workspaces
+  - workspace switcher in dashboard
+  - workspace roles:
+    - `owner`
+    - `admin`
+    - `member`
+    - `viewer`
+    - `finance`
+  - project-scoped access controls for non-admin users
+  - plan-based seat limits and billing-aware upgrade prompts
+- Defer to enterprise phase:
+  - custom roles
+  - fine-grained resource permissions
+  - policy authoring UI
+  - SSO/SCIM
+
+## Customer Usage Intelligence Before Gateway
+
+- Treat customer usage as a first-class surface for SaaS builders instead of asking them to encode billing-grade logic only in metadata.
+- Scope before gateway:
+  - explicit dimensions for `customer_id`, `end_user_id`, and `organization_id`
+  - customer-wise token and cost rollups
+  - finance-ready exports and APIs
+  - usage webhooks for sync, credits, and threshold events
+- Metadata remains supported for extra context, but billing-grade aggregation should prefer indexed first-class fields.
 
 ## Cross-Phase: Opinionated Integrations (started in Phase 2)
 

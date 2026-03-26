@@ -1,0 +1,201 @@
+{
+  "id": "2026-03-26-access-model-customer-usage-and-release-history",
+  "title": "Close the pre-gateway access model, customer usage, release history, and Wave 3 tracking gaps",
+  "date": "2026-03-26",
+  "summary": "Records release evidence for the shipped multi-workspace access model, workspace roles, project allowlists, finance-safe billing/reporting, customer usage APIs and webhook delivery, team adoption metrics, public announcements/changelog surfaces, release-history generation hooks, and the completed Wave 3 PHP/Rust SDK qualification path.",
+  "completed_todo_items": [
+    "Add team seat-limit visibility to billing and settings",
+    "Add basic team collaboration for paying tenants:",
+    "Add public `/announcements` page with chronological archive and stable detail routes",
+    "Add public `/changelog` page with chronological archive and stable detail routes",
+    "Add SEO-ready detail pages for SDK releases, feature launches, and milestone completions with backlinks to docs, integrations, and related product pages",
+    "Hook release evidence / milestone completion into announcement + changelog generation so those pages update consistently after meaningful ship events",
+    "Wave 3: ship `tokvera-php` and `tokvera-rust` with the same parity bar after Java/.NET are stable",
+    "Track team adoption metrics alongside paid conversion:",
+    "Add customer usage intelligence for SaaS builders before gateway:",
+    "Add `teams`, `team_members`, and `team_invitations` data model support",
+    "Add `tenant_memberships` so one verified user can belong to multiple workspaces",
+    "Add owner/admin-only invite and removal API",
+    "Add workspace switcher support in the dashboard session model",
+    "Add workspace roles: `owner`, `admin`, `member`, `viewer`, `finance`",
+    "Add project-scoped access policies for `member`, `viewer`, and `finance` roles",
+    "Enforce team seat caps through billing entitlements",
+    "Free plan: 1 member by default",
+    "Paid plans: capped members by tier",
+    "Add Team settings page with invite, resend, revoke, and remove actions",
+    "Add invite email flow and acceptance path",
+    "Add finance role views for invoices, usage totals, customer rollups, and exports without API-key or raw-payload admin access",
+    "Add docs for team management, seat limits, and admin responsibilities",
+    "Add first-class event dimensions for `customer_id`, `end_user_id`, `organization_id`, and optional `credit_bucket`",
+    "Add customer-wise token/cost read models and export-ready aggregates",
+    "Add `GET /v1/usage/customers` and detail/export surfaces for customer usage reconciliation",
+    "Add customer usage webhook events for usage sync, credit decrement, quota reached, and threshold alerts"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "prisma/schema.prisma",
+          "src/app.js",
+          "tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/dashboard-provider.tsx",
+          "components/dashboard-scope-bar.tsx",
+          "components/dashboard-quick-jump.tsx",
+          "components/sidebar.tsx",
+          "lib/api.ts",
+          "lib/dashboard-help.ts",
+          "lib/dashboard-navigation.ts",
+          "app/dashboard/team/page.tsx",
+          "app/dashboard/billing/page.tsx",
+          "app/dashboard/projects/page.tsx",
+          "app/dashboard/api-keys/page.tsx",
+          "app/dashboard/customers/page.tsx",
+          "app/dashboard/customers/[customerId]/page.tsx",
+          "app/docs/user-guide/page.tsx",
+          "app/super-admin/(protected)/dashboard/dashboard-content.tsx",
+          "app/(marketing)/announcements/page.tsx",
+          "app/(marketing)/announcements/[slug]/page.tsx",
+          "app/(marketing)/changelog/page.tsx",
+          "app/(marketing)/changelog/[slug]/page.tsx",
+          "components/releases/release-archive-page.tsx",
+          "components/releases/release-detail-page.tsx",
+          "content/release-events.json",
+          "content/release-evidence-overrides.json",
+          "scripts/build-release-content.mjs",
+          "scripts/sync-release-evidence.mjs",
+          "scripts/validate-release-events.mjs",
+          "scripts/validate-release-evidence-overrides.mjs",
+          "lib/release-content.ts"
+        ]
+      },
+      {
+        "repo": "tokvera-php",
+        "paths": [
+          "src/TokveraSdk.php",
+          "examples/manual_tracer.php",
+          "tests/TokveraSdkTest.php"
+        ]
+      },
+      {
+        "repo": "tokvera-rust",
+        "paths": [
+          "src/lib.rs",
+          "examples/manual_tracer.rs",
+          "examples/provider_wrappers.rs"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md",
+          "ROADMAP.md",
+          "test/generate-activation-report.mjs"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check"
+        ]
+      },
+      {
+        "repo": "tokvera-php",
+        "commands": [
+          "composer test"
+        ]
+      },
+      {
+        "repo": "tokvera-rust",
+        "commands": [
+          "cargo test"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/user-guide/page.tsx",
+          "content/README.md",
+          "content/release-events.schema.json",
+          "content/release-evidence-overrides.schema.json"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ROADMAP.md",
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/team/page.tsx",
+          "app/dashboard/customers/page.tsx",
+          "app/dashboard/customers/[customerId]/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera-php",
+        "paths": [
+          "examples/manual_tracer.php"
+        ]
+      },
+      {
+        "repo": "tokvera-rust",
+        "paths": [
+          "examples/manual_tracer.rs"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ],
+        "notes": "Confirms workspace roles, project allowlists, customer usage APIs, webhook dispatch, and super-admin/customer attribution contracts."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check"
+        ],
+        "notes": "Confirms the dashboard access model, customer usage surfaces, billing/help content, and release-history routes stay type-safe and documented."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Ensures the EXECUTION_TODO cleanup is backed by release evidence before the coordination repo is pushed."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the access-model, customer-usage, release-history, and Wave 3 tracking updates in the affected repos if workspace authorization, customer reconciliation, or public release-history generation regresses."
+  }
+}

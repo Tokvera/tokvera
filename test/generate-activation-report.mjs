@@ -67,6 +67,9 @@ function buildMarkdown(report) {
     `- Tenants with first event in window: ${report.summary.tenants_with_first_event_30d}`,
     `- Tenants with live trace review in window: ${report.summary.tenants_with_live_trace_review_30d}`,
     `- Tenants with trace debugging session in window: ${report.summary.tenants_with_trace_debug_session_30d}`,
+    `- Tenants with first team invite in window: ${report.summary.tenants_with_team_invite_created_30d}`,
+    `- Tenants with accepted team invite in window: ${report.summary.tenants_with_team_invite_accepted_30d}`,
+    `- Tenants that became multi-member in window: ${report.summary.tenants_with_multi_member_workspace_30d}`,
     `- Non-free tenants: ${report.summary.non_free_tenants}`,
     `- Paid tenants in good standing: ${report.summary.paid_tenants_in_good_standing}`,
     `- Active paid tenants in window: ${report.summary.active_paid_tenants_30d}`,
@@ -82,7 +85,7 @@ function buildMarkdown(report) {
     ...(blockedTenants.length
       ? blockedTenants.map(
           (item) =>
-            `- ${item.tenant_name} (${item.tenant_id}) | plan=${item.plan?.id || "free"} | status=${item.subscription?.status || "none"} | requests_30d=${item.request_count_30d} | live_trace=${item.activation?.has_live_trace_review_30d ? "yes" : "no"} | debug_session=${item.activation?.has_trace_debug_session_30d ? "yes" : "no"} | blockers=${(item.activation?.blockers || []).join(", ") || "none"}`
+            `- ${item.tenant_name} (${item.tenant_id}) | plan=${item.plan?.id || "free"} | status=${item.subscription?.status || "none"} | requests_30d=${item.request_count_30d} | live_trace=${item.activation?.has_live_trace_review_30d ? "yes" : "no"} | debug_session=${item.activation?.has_trace_debug_session_30d ? "yes" : "no"} | team_invite=${item.activation?.has_team_invite_created_30d ? "yes" : "no"} | team_joined=${item.activation?.has_team_invite_accepted_30d ? "yes" : "no"} | blockers=${(item.activation?.blockers || []).join(", ") || "none"}`
         )
       : ["- none"]),
     "",
