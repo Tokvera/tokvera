@@ -68,6 +68,22 @@ This runs:
 - LangChain callback helper
 - Vercel AI SDK `generateText` wrapper
 
+### Node Customer Usage Sync Example
+
+```bash
+cd examples/node
+npm install
+npm run example:customer-usage-sync
+```
+
+Use this when your SaaS app needs to mirror Tokvera customer usage into its own credit or quota ledger.
+It reads:
+
+- `GET /v1/usage/customers`
+- `GET /v1/usage/customers/:customerId`
+
+and prints a downstream ledger-shaped payload you can adapt to your own billing model.
+
 ## Python Example
 
 Create local env file first:
@@ -98,6 +114,16 @@ This runs:
 - LangChain callback helper
 - LlamaIndex callback helper
 
+### Python Customer Usage Sync Example
+
+```bash
+cd examples/python
+pip install -r requirements.txt
+python customer_usage_sync.py
+```
+
+Use this when your SaaS app wants the same customer usage reconciliation pattern in Python.
+
 ## Telemetry Coverage
 
 All examples emit Trace Context v1 tags:
@@ -126,3 +152,16 @@ The updated examples also emit Evaluation Signals v1:
 
 Python compatibility:
 - Python example filters track kwargs against the installed SDK signature, so it remains runnable on slightly older PyPI builds while still demonstrating v2 fields when available.
+
+## Customer Usage Sync Inputs
+
+The customer usage sync examples use these additional environment variables:
+
+- `TOKVERA_API_BASE_URL`
+- `TOKVERA_SESSION_TOKEN`
+- `TOKVERA_TENANT_ID`
+- `TOKVERA_PROJECT_ID` (optional)
+- `TOKVERA_CUSTOMER_ID` (optional)
+- `TOKVERA_CUSTOMER_USAGE_DAYS` (optional)
+
+They are intended for finance-safe reconciliation and customer credit mirroring, not raw prompt inspection.

@@ -253,8 +253,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Add customer-wise token/cost read models and export-ready aggregates
 - [x] Add `GET /v1/usage/customers` and detail/export surfaces for customer usage reconciliation
 - [x] Add customer usage webhook events for usage sync, credit decrement, quota reached, and threshold alerts
-- [ ] Add docs/examples for SaaS builders to mirror Tokvera usage into their own customer credit systems
-- [ ] Add contract tests and E2E coverage for customer-usage APIs and webhook delivery
+- [x] Add docs/examples for SaaS builders to mirror Tokvera usage into their own customer credit systems
+- [x] Add contract tests and E2E coverage for customer-usage APIs and webhook delivery
 
 ## Release Checklist Template (use each 2-week cycle)
 

@@ -1,0 +1,144 @@
+{
+  "id": "2026-03-27-customer-usage-sync-contracts-and-examples",
+  "title": "Close customer usage sync docs, contract, and example gaps",
+  "date": "2026-03-27",
+  "summary": "Records release evidence for the machine-readable customer usage webhook contract, SaaS-builder sync docs, Node and Python reconciliation examples, and the remaining targeted contract and dashboard coverage for customer usage APIs and webhook delivery.",
+  "completed_todo_items": [
+    "Add docs/examples for SaaS builders to mirror Tokvera usage into their own customer credit systems",
+    "Add contract tests and E2E coverage for customer-usage APIs and webhook delivery"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/customer-usage-contract.js",
+          "src/app.js",
+          "docs/customer-usage-webhook-v1.contract.json",
+          "docs/CUSTOMER_USAGE_SYNC.md",
+          "scripts/check-customer-usage-contract-sync.mjs",
+          "tests/server.test.js",
+          "README.md",
+          "package.json"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/customer-usage-sync/page.tsx",
+          "app/docs/page.tsx",
+          "app/docs/get-started/page.tsx",
+          "app/docs/user-guide/page.tsx",
+          "lib/docs-content.ts",
+          "lib/dashboard-help.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts",
+          "tests/e2e/dashboard-product-paths.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "README.md",
+          "EXECUTION_TODO.md",
+          "examples/README.md",
+          "examples/node/.env.example",
+          "examples/node/customer-usage-sync.mjs",
+          "examples/node/package.json",
+          "examples/python/.env.example",
+          "examples/python/customer_usage_sync.py"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "node scripts/check-customer-usage-contract-sync.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep customer"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "docs/CUSTOMER_USAGE_SYNC.md",
+          "docs/customer-usage-webhook-v1.contract.json"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/customer-usage-sync/page.tsx",
+          "app/docs/user-guide/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/README.md",
+          "README.md",
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/node/customer-usage-sync.mjs",
+          "examples/python/customer_usage_sync.py"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "node scripts/check-customer-usage-contract-sync.mjs"
+        ],
+        "notes": "Confirms the published customer usage webhook contract, schema endpoint, automated webhook payloads, and manual dispatch path stay aligned."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep customer"
+        ],
+        "notes": "Confirms the customer usage sync docs route, public docs discovery, customer export flow, and customer webhook dispatch coverage."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the execution board cleanup is backed by release evidence before coordination changes are pushed."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the customer usage contract/docs/example additions in tokvera-api, tokvera-dashboard, and tokvera if downstream credit-sync integrators report incompatible payload or export behavior."
+  }
+}

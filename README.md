@@ -46,9 +46,16 @@ This repository is the public coordination and documentation entry point for the
 - `test/generate-activation-report.mjs` (weekly paid-tenant and activation gate report)
 - `test/generate-weekly-ops-review.mjs` (weekly billing reliability + operating-window review)
 
+Notable example additions:
+
+- `examples/node/customer-usage-sync.mjs`
+- `examples/python/customer_usage_sync.py`
+
 These include trace context, evaluation signals, and framework integration patterns.
 They also now demonstrate lifecycle-enabled live tracing so runs can appear immediately in
 `/dashboard/traces/live` while calls are still in progress.
+They also include customer usage sync examples for SaaS teams that need to mirror Tokvera usage into their own
+credit or quota systems through finance-safe APIs and webhook payloads.
 
 Starter templates currently include:
 

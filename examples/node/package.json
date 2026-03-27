@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "example": "node index.mjs",
-    "example:integrations": "node integrations.mjs"
+    "example:integrations": "node integrations.mjs",
+    "example:customer-usage-sync": "node customer-usage-sync.mjs"
   },
   "dependencies": {
     "@tokvera/sdk": "^0.2.9"
