@@ -1,0 +1,116 @@
+{
+  "id": "2026-03-27-weekly-reviews-and-commercial-signals",
+  "title": "Close weekly reviews and commercial signal loops",
+  "date": "2026-03-27",
+  "summary": "Records release evidence for the new weekly Action Center digest and churn or upgrade commercial review endpoints, the dashboard Reviews workspace, and the matching execution board cleanup for the account-owner review loop.",
+  "completed_todo_items": [
+    "Weekly action-center digest for account owners",
+    "Churn/upgrade review loop based on usage + billing signals"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/app.js",
+          "tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/reviews/page.tsx",
+          "app/docs/api-reference/page.tsx",
+          "app/docs/user-guide/page.tsx",
+          "lib/api.ts",
+          "lib/dashboard-help.ts",
+          "lib/dashboard-navigation.ts",
+          "tests/e2e/dashboard-product-paths.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "pnpm build",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep \"finance role can review billing guardrails and export customer usage from billing|finance role can run the weekly reviews workflow from one page\""
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/api-reference/page.tsx",
+          "app/docs/user-guide/page.tsx",
+          "lib/dashboard-help.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/reviews/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ],
+        "notes": "Confirms the weekly digest and commercial review endpoints resolve scope-aware billing, team, and customer signals for billing-manager roles."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep \"finance role can review billing guardrails and export customer usage from billing|finance role can run the weekly reviews workflow from one page\""
+        ],
+        "notes": "Confirms the Reviews page, finance-safe billing exports, and dashboard navigation stay buildable and reachable in the product-path harness."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the execution board closeout is backed by release evidence before coordination changes are pushed."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the review endpoints and dashboard review workspace if account-owner digest summaries or commercial signal classification regress in production."
+  }
+}

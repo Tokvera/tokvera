@@ -223,8 +223,8 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
 - [ ] Maintain integration packs (JS/Python, Express/FastAPI, LangChain/LlamaIndex)
 - [ ] Monthly docs refresh with incident-to-fix workflows
-- [ ] Weekly action-center digest for account owners
-- [ ] Churn/upgrade review loop based on usage + billing signals
+- [x] Weekly action-center digest for account owners
+- [x] Churn/upgrade review loop based on usage + billing signals
 - [ ] Sustain 20 active SaaS users
 - [ ] Reach $10k MRR
 
