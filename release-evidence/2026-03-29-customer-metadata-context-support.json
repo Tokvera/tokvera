@@ -1,0 +1,101 @@
+{
+  "id": "2026-03-29-customer-metadata-context-support",
+  "title": "Add customer metadata context support without weakening billing aggregation",
+  "date": "2026-03-29",
+  "summary": "Records release evidence for optional event metadata support on customer-attributed traffic, bounded validation and persistence in the API, latest-metadata context on customer usage detail and webhook payloads, and the execution-board closeout for metadata support that stays separate from billing-grade aggregation keys.",
+  "completed_todo_items": [
+    "Keep metadata support for extra context, but do not depend on free-form metadata for billing-grade aggregation"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/validator.js",
+          "src/app.js",
+          "src/customer-usage-contract.js",
+          "prisma/schema.prisma",
+          "tests/server.test.js",
+          "docs/CUSTOMER_USAGE_SYNC.md",
+          "docs/customer-usage-webhook-v1.contract.json"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/node/customer-usage-sync.mjs",
+          "examples/python/customer_usage_sync.py",
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "npx prisma validate",
+          "node scripts/check-customer-usage-contract-sync.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node --check examples/node/customer-usage-sync.mjs",
+          "python -m py_compile examples/python/customer_usage_sync.py",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "docs/CUSTOMER_USAGE_SYNC.md",
+          "docs/customer-usage-webhook-v1.contract.json"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md",
+          "examples/node/customer-usage-sync.mjs",
+          "examples/python/customer_usage_sync.py"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "examples/node/customer-usage-sync.mjs",
+          "examples/python/customer_usage_sync.py"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "node scripts/check-customer-usage-contract-sync.mjs"
+        ],
+        "notes": "Confirms optional metadata is validated, persisted, and surfaced only as latest-context on customer usage detail and webhook payloads."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node --check examples/node/customer-usage-sync.mjs",
+          "python -m py_compile examples/python/customer_usage_sync.py",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the public reconciliation examples stay valid while the execution-board closeout remains backed by release evidence."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the metadata field additions if downstream consumers mis-handle the new optional customer usage payload context fields or if event-ingest validators reject legitimate production traffic."
+  }
+}

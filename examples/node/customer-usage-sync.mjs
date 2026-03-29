@@ -44,6 +44,8 @@ function toWebhookLedgerEvent(payload) {
     credit_bucket: payload.credit_bucket,
     remaining_credits: payload.remaining_credits,
     threshold: payload.threshold,
+    metadata: payload.metadata || null,
+    metadata_observed_at: payload.metadata_observed_at || null,
   };
 }
 
@@ -97,6 +99,8 @@ async function main() {
     credit_bucket: detail.by_credit_bucket?.[0]?.group || null,
     remaining_credits: null,
     threshold: null,
+    metadata: detail.metadata || null,
+    metadata_observed_at: detail.metadata_observed_at || null,
     overview: detail.overview,
   };
 

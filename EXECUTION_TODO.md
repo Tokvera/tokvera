@@ -250,7 +250,7 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 ## Customer Usage / Webhooks / Reporting
 
 - [x] Add first-class event dimensions for `customer_id`, `end_user_id`, `organization_id`, and optional `credit_bucket`
-- [ ] Keep metadata support for extra context, but do not depend on free-form metadata for billing-grade aggregation
+- [x] Keep metadata support for extra context, but do not depend on free-form metadata for billing-grade aggregation
 - [x] Add customer-wise token/cost read models and export-ready aggregates
 - [x] Add `GET /v1/usage/customers` and detail/export surfaces for customer usage reconciliation
 - [x] Add customer usage webhook events for usage sync, credit decrement, quota reached, and threshold alerts

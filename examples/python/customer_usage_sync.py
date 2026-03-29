@@ -61,6 +61,8 @@ def to_webhook_ledger_event(payload: dict) -> dict:
         "credit_bucket": payload.get("credit_bucket"),
         "remaining_credits": payload.get("remaining_credits"),
         "threshold": payload.get("threshold"),
+        "metadata": payload.get("metadata"),
+        "metadata_observed_at": payload.get("metadata_observed_at"),
     }
 
 
@@ -118,6 +120,8 @@ def main() -> None:
         ),
         "remaining_credits": None,
         "threshold": None,
+        "metadata": detail_payload.get("metadata"),
+        "metadata_observed_at": detail_payload.get("metadata_observed_at"),
         "overview": detail_payload["overview"],
     }
 
