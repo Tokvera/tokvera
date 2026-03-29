@@ -1,0 +1,115 @@
+{
+  "id": "2026-03-29-weekly-review-delivery-automation",
+  "title": "Automate weekly review delivery",
+  "date": "2026-03-29",
+  "summary": "Records release evidence for workspace-level weekly review delivery automation: review settings and manual dispatch in the dashboard, review settings and internal runner endpoints in the API, and the execution-board closeout for automated weekly review email delivery.",
+  "completed_todo_items": [
+    "Automate weekly review email delivery with manual dispatch and an internal runner token"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/app.js",
+          "src/auth/email.js",
+          "prisma/schema.prisma",
+          "tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/reviews/page.tsx",
+          "lib/api.ts",
+          "lib/dashboard-help.ts",
+          "app/docs/user-guide/page.tsx",
+          "tests/e2e/dashboard-product-paths.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "npx prisma validate"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "pnpm build",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep \"weekly reviews workflow\""
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/user-guide/page.tsx",
+          "lib/dashboard-help.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/reviews/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ],
+        "notes": "Confirms weekly review settings persistence, manual dispatch, and the internal review runner all resolve against the same digest and commercial review bundle."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts --grep \"weekly reviews workflow\""
+        ],
+        "notes": "Confirms the Reviews page builds cleanly, loads the new delivery settings, and can send the current workspace-wide bundle from the product-path harness."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the milestone closeout stays backed by release evidence."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the review automation endpoints and dashboard settings panel if scheduled delivery sends the wrong scope or recipient set in production."
+  }
+}
