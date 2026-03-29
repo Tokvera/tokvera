@@ -1,0 +1,100 @@
+{
+  "id": "2026-03-29-coding-agent-acquisition-and-eval-docs",
+  "title": "Ship coding-agent acquisition, comparison, and CI eval docs",
+  "date": "2026-03-29",
+  "summary": "Records release evidence for the new coding-agent observability acquisition surfaces, the LangSmith-for-coding-agents comparison page, and the CI and tracing docs that turn coding-agent rollout guidance into concrete operational setup.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/use-cases/coding-agent-observability/page.tsx",
+          "app/(marketing)/compare/langsmith-for-coding-agents/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/docs/agent-evals-in-ci/page.tsx",
+          "app/docs/coding-agent-tracing/page.tsx",
+          "app/docs/page.tsx",
+          "app/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "lib/docs-content.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-03-29-coding-agent-acquisition-and-eval-docs.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/agent-evals-in-ci/page.tsx",
+          "app/docs/coding-agent-tracing/page.tsx",
+          "app/docs/page.tsx",
+          "lib/docs-content.ts"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/agent-evals-in-ci/page.tsx",
+          "app/docs/coding-agent-tracing/page.tsx",
+          "app/(marketing)/use-cases/coding-agent-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "pnpm docs:check",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new coding-agent landing page, comparison page, CI docs, tracing docs, and public discovery links all render from the production build."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the content batch is represented in the release-evidence pipeline so announcements and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the coding-agent acquisition pages, docs routes, and release-evidence manifest in tokvera-dashboard and tokvera if the content direction or public positioning needs to be changed."
+  }
+}
