@@ -1,0 +1,117 @@
+{
+  "id": "2026-03-29-team-seat-policy-and-e2e-gates",
+  "title": "Close enterprise seat policy and team-flow E2E gaps",
+  "date": "2026-03-29",
+  "summary": "Records release evidence for configurable team seat allowances on Scale enterprise workspaces, invite-acceptance and seat-limit upgrade handling in the dashboard, and the product-path E2E coverage that now exercises invite acceptance, seat-limit rejection, and upgrade CTA behavior.",
+  "completed_todo_items": [
+    "Enterprise/custom plans: configurable seat allowance",
+    "Add E2E coverage for invite, accept, over-seat rejection, and upgrade CTA"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-api",
+        "paths": [
+          "src/app.js",
+          "prisma/schema.prisma",
+          "tests/server.test.js"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/team/page.tsx",
+          "app/dashboard/billing/page.tsx",
+          "components/dashboard-provider.tsx",
+          "tests/e2e/dashboard-product-paths.spec.ts",
+          "app/docs/user-guide/page.tsx",
+          "lib/dashboard-help.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js",
+          "npx prisma validate"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "pnpm docs:check",
+          "pnpm dashboard:help:check",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/docs/user-guide/page.tsx",
+          "lib/dashboard-help.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "EXECUTION_TODO.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/team/page.tsx",
+          "app/dashboard/billing/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-api",
+        "commands": [
+          "node --test tests/server.test.js"
+        ],
+        "notes": "Confirms team seat-limit enforcement, invite acceptance, and enterprise custom seat-limit policy enforcement on Scale workspaces."
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npx playwright test tests/e2e/dashboard-product-paths.spec.ts"
+        ],
+        "notes": "Confirms invite acceptance lands in the invited workspace, seat-limit rejection shows the upgrade CTA, and the wider role/customer webhook workflows remain green."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the execution-board closeout stays backed by release evidence."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Reopen the execution items and revert the team seat-limit policy or dashboard invite-flow changes if deployed workspaces cannot accept invites cleanly or enterprise custom seat allowances do not resolve correctly."
+  }
+}

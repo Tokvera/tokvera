@@ -1,6 +1,6 @@
 # Tokvera Execution TODO (Mar 11, 2026 -> Mar 31, 2027)
 
-Last updated: 2026-03-16
+Last updated: 2026-03-29
 Owner: product + engineering
 Cadence: 2-week releases (API-first, dashboard follows API contracts)
 
@@ -240,11 +240,11 @@ Cadence: 2-week releases (API-first, dashboard follows API contracts)
 - [x] Enforce team seat caps through billing entitlements
 - [x] Free plan: 1 member by default
 - [x] Paid plans: capped members by tier
-- [ ] Enterprise/custom plans: configurable seat allowance
+- [x] Enterprise/custom plans: configurable seat allowance
 - [x] Add Team settings page with invite, resend, revoke, and remove actions
 - [x] Add invite email flow and acceptance path
 - [x] Add finance role views for invoices, usage totals, customer rollups, and exports without API-key or raw-payload admin access
-- [ ] Add E2E coverage for invite, accept, over-seat rejection, and upgrade CTA
+- [x] Add E2E coverage for invite, accept, over-seat rejection, and upgrade CTA
 - [x] Add docs for team management, seat limits, and admin responsibilities
 
 ## Customer Usage / Webhooks / Reporting
