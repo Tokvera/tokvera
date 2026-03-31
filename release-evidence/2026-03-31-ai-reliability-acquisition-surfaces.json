@@ -1,0 +1,95 @@
+{
+  "id": "2026-03-31-ai-reliability-acquisition-surfaces",
+  "title": "Ship AI reliability acquisition surfaces and rollout-risk content",
+  "date": "2026-03-31",
+  "summary": "Records release evidence for the new AI-reliability landing page, the reliability-focused generic dashboard comparison page, and the rollout-risk weekly review content that connects incidents, release history, and customer impact.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-reliability-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/use-cases/ai-gateway-observability/page.tsx",
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx",
+          "app/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-03-31-ai-reliability-acquisition-surfaces.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-reliability-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-reliability-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new reliability landing page, reliability comparison page, homepage discovery links, and rollout-risk blog route all render from the production build."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the AI-reliability content batch is represented in the release-evidence pipeline so announcements and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the AI-reliability landing page, reliability comparison entry, rollout-risk blog content, and release-evidence manifest in tokvera-dashboard and tokvera if the positioning or SEO direction needs to be changed."
+  }
+}
