@@ -1,0 +1,95 @@
+{
+  "id": "2026-03-31-ai-support-ops-acquisition-surfaces",
+  "title": "Ship AI support ops acquisition surfaces and weekly review content",
+  "date": "2026-03-31",
+  "summary": "Records release evidence for the new AI-support-ops landing page, the support-ops-focused generic dashboard comparison page, and the weekly-review content cluster that connects support workflow observability to upgrade-pressure and commercial operating reviews.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-support-ops/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-support-ops/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/use-cases/customer-support-ai-observability/page.tsx",
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx",
+          "app/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-03-31-ai-support-ops-acquisition-surfaces.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-support-ops/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-support-ops/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-ai-support-ops/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-support-ops/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npx playwright test tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new support-ops landing page, support-ops comparison page, homepage discovery links, and weekly-review blog route all render from the production build."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the AI-support-ops content batch is represented in the release-evidence pipeline so announcements and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the AI-support-ops landing page, compare entry, support-ops weekly review blog content, and release-evidence manifest in tokvera-dashboard and tokvera if the positioning or SEO direction needs to be changed."
+  }
+}
