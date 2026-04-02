@@ -1,0 +1,96 @@
+{
+  "id": "2026-04-02-onboarding-acquisition-surfaces",
+  "title": "Ship onboarding acquisition surfaces and activation content",
+  "date": "2026-04-02",
+  "summary": "Records release evidence for the new onboarding landing page, the onboarding generic dashboard comparison page, and the activation blog that ties customer usage, release history, and weekly reviews into one early-customer workflow.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-onboarding-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/for-implementation-teams/page.tsx",
+          "app/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-02-onboarding-acquisition-surfaces.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm release-history:check"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-onboarding-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-onboarding-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm release-history:check"
+        ],
+        "notes": "Confirms the onboarding landing page, onboarding comparison page, homepage discovery links, and activation blog route all render from the production build and stay visible in the public route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the onboarding acquisition batch is represented in release evidence so announcement and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the onboarding landing page, onboarding comparison entry, activation blog content, and release-evidence manifest in tokvera-dashboard and tokvera if the positioning or SEO direction needs to change."
+  }
+}
