@@ -1,0 +1,96 @@
+{
+  "id": "2026-04-02-implementation-acquisition-surfaces",
+  "title": "Ship implementation acquisition surfaces and rollout execution content",
+  "date": "2026-04-02",
+  "summary": "Records release evidence for the new implementation landing page, the implementation generic dashboard comparison page, and the rollout-execution blog that ties customer usage, release history, and weekly reviews into one onboarding and rollout workflow.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/for-solutions-engineering-teams/page.tsx",
+          "app/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-02-implementation-acquisition-surfaces.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm release-history:check"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm release-history:check"
+        ],
+        "notes": "Confirms the implementation landing page, implementation comparison page, homepage discovery links, and rollout-execution blog route all render from the production build and stay visible in the public route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the implementation acquisition batch is represented in release evidence so announcement and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the implementation landing page, implementation comparison entry, rollout-execution blog content, and release-evidence manifest in tokvera-dashboard and tokvera if the positioning or SEO direction needs to change."
+  }
+}
