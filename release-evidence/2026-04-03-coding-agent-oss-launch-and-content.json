@@ -1,0 +1,135 @@
+{
+  "id": "2026-04-03-coding-agent-oss-launch-and-content",
+  "title": "Launch coding-agent OSS starter and supporting website content",
+  "date": "2026-04-03",
+  "summary": "Records release evidence for the public coding-agent-pr-ops starter repo and the website blog post that explains how to build a coding-agent PR planning workflow with one root trace.",
+  "completed_todo_items": [
+    "Ship 2 practical blog posts every sprint",
+    "Keep release-history generation tied to release evidence for meaningful public launches"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "coding-agent-pr-ops",
+        "paths": [
+          "README.md",
+          "CONTENT_DISTRIBUTION.md",
+          "src/server.ts",
+          "src/sample-tasks.ts"
+        ]
+      },
+      {
+        "repo": "open-deep-research-workbench",
+        "paths": [
+          "README.md",
+          "CONTENT_DISTRIBUTION.md",
+          "src/server.ts",
+          "src/sample-briefs.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-03-coding-agent-oss-launch-and-content.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "coding-agent-pr-ops",
+        "commands": [
+          "npm run build"
+        ]
+      },
+      {
+        "repo": "open-deep-research-workbench",
+        "commands": [
+          "npm run build"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      },
+      {
+        "repo": "coding-agent-pr-ops",
+        "paths": [
+          "README.md",
+          "CONTENT_DISTRIBUTION.md"
+        ]
+      },
+      {
+        "repo": "open-deep-research-workbench",
+        "paths": [
+          "README.md",
+          "CONTENT_DISTRIBUTION.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "coding-agent-pr-ops",
+        "paths": [
+          "src/server.ts",
+          "src/sample-tasks.ts"
+        ]
+      },
+      {
+        "repo": "open-deep-research-workbench",
+        "paths": [
+          "src/server.ts",
+          "src/sample-briefs.ts"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the coding-agent OSS blog route renders in the public site and remains discoverable under the blog surface."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the OSS/content launch is represented in release evidence so announcements and changelog generation stay current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the coding-agent workflow blog entry and the release-evidence manifest if the OSS positioning or launch copy needs to change."
+  }
+}
