@@ -1,0 +1,97 @@
+{
+  "id": "2026-04-03-glossary-seo-foundation-pages",
+  "title": "Ship glossary foundation pages for AI tracing and agent observability",
+  "date": "2026-04-03",
+  "summary": "Records release evidence for the glossary hub and the first four glossary pages covering AI tracing, agent observability, LangGraph tracing, and root traces, plus the related discovery and route-smoke updates.",
+  "completed_todo_items": [
+    "Publish 4 glossary pages for foundational definitions and snippet capture."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/glossary-page.tsx",
+          "app/(marketing)/glossary/page.tsx",
+          "app/(marketing)/glossary/what-is-ai-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-langgraph-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-root-trace/page.tsx",
+          "components/marketing/marketing-footer.tsx",
+          "app/docs/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-03-glossary-seo-foundation-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/glossary/page.tsx",
+          "app/(marketing)/glossary/what-is-ai-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-langgraph-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-root-trace/page.tsx",
+          "app/docs/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/glossary/what-is-ai-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-langgraph-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-root-trace/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the glossary hub and all four definition pages render and remain covered in the public route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the glossary batch is represented in release evidence so announcements and changelog generation remain current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the glossary hub, the four definition pages, and the release-evidence manifest if the SEO positioning or internal linking strategy needs to change."
+  }
+}
