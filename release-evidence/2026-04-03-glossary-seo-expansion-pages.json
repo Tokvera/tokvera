@@ -1,0 +1,93 @@
+{
+  "id": "2026-04-03-glossary-seo-expansion-pages",
+  "title": "Expand glossary coverage for prompt, workflow, LLM, and agent tracing terms",
+  "date": "2026-04-03",
+  "summary": "Records release evidence for the second glossary batch covering prompt tracing, AI workflow observability, LLM observability, and agent tracing, plus the expanded glossary hub and public route-smoke updates.",
+  "completed_todo_items": [
+    "Build the glossary and educational content foundation for tracing, observability, and workflow terms."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/glossary/page.tsx",
+          "app/(marketing)/glossary/what-is-prompt-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-ai-workflow-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-llm-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-tracing/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-03-glossary-seo-expansion-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/glossary/page.tsx",
+          "app/(marketing)/glossary/what-is-prompt-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-ai-workflow-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-llm-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-tracing/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/glossary/what-is-prompt-tracing/page.tsx",
+          "app/(marketing)/glossary/what-is-ai-workflow-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-llm-observability/page.tsx",
+          "app/(marketing)/glossary/what-is-agent-tracing/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the glossary hub and the four new definition pages render and remain covered in the public route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the glossary expansion is represented in release evidence so announcements and changelog generation remain current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the glossary hub updates, the four new glossary pages, and the release-evidence manifest if the glossary expansion or internal-link strategy needs to change."
+  }
+}
