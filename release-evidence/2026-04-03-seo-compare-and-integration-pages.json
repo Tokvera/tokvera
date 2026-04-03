@@ -1,0 +1,100 @@
+{
+  "id": "2026-04-03-seo-compare-and-integration-pages",
+  "title": "Ship exact-intent compare pages and Python integration SEO surfaces",
+  "date": "2026-04-03",
+  "summary": "Records release evidence for the exact-intent competitor comparison pages and the missing high-intent integration pages from the SEO master sheet, including Langfuse, LangSmith, Helicone, Arize Phoenix, FastAPI, Python workflow tracing, and LangGraph observability.",
+  "completed_todo_items": [
+    "Create the first 5 competitor pages from the `P1` list."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/integration-intent-page.tsx",
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langfuse/page.tsx",
+          "app/(marketing)/compare/langsmith-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/compare/helicone-alternative/page.tsx",
+          "app/(marketing)/compare/arize-phoenix-alternative/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-ai-workflow-tracing/page.tsx",
+          "app/(marketing)/integrations/langgraph-observability/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/integrations/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-03-seo-compare-and-integration-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/langsmith-alternative/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-ai-workflow-tracing/page.tsx",
+          "app/(marketing)/integrations/langgraph-observability/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-ai-workflow-tracing/page.tsx",
+          "app/(marketing)/integrations/langgraph-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new compare and integration pages render and remain covered by the public route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the new SEO surfaces are represented in release evidence so announcements and changelog generation remain current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the newly added compare and integration pages plus the release-evidence manifest if the positioning or internal-link strategy needs to be adjusted."
+  }
+}
