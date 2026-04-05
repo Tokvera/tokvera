@@ -1,0 +1,96 @@
+{
+  "id": "2026-04-05-pricing-and-python-openai-intent-pages",
+  "title": "Ship pricing-intent compare pages and Python OpenAI tracing page",
+  "date": "2026-04-05",
+  "summary": "Records release evidence for the new exact-intent pages covering Tokvera vs Helicone, Langfuse pricing alternative, LangSmith pricing alternative, and Python OpenAI tracing, plus the compare and integrations hub updates and public route smoke coverage.",
+  "completed_todo_items": [
+    "Create the `/compare/` page set for competitor keywords.",
+    "Create the `/integrations/` page set for LangGraph, FastAPI, OpenAI SDK, Python workflow tracing, and gateway observability."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/tokvera-vs-helicone/page.tsx",
+          "app/(marketing)/compare/langfuse-pricing-alternative/page.tsx",
+          "app/(marketing)/compare/langsmith-pricing-alternative/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/integrations/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-05-pricing-and-python-openai-intent-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/tokvera-vs-helicone/page.tsx",
+          "app/(marketing)/compare/langfuse-pricing-alternative/page.tsx",
+          "app/(marketing)/compare/langsmith-pricing-alternative/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "app/(marketing)/integrations/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/tokvera-vs-helicone/page.tsx",
+          "app/(marketing)/compare/langfuse-pricing-alternative/page.tsx",
+          "app/(marketing)/compare/langsmith-pricing-alternative/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new compare and integration intent pages render and remain covered by the public acquisition route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the keyword-sheet expansion is represented in release evidence so announcements and changelog generation remain current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the four intent pages, compare/integrations hub updates, smoke-test updates, and the release-evidence manifest if the page targeting or buyer-intent framing needs to change."
+  }
+}
