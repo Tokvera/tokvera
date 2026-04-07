@@ -180,9 +180,17 @@ node ops/seo/scripts/run-weekly-seo-review.mjs \
   --queries-7d path/to/gsc-queries-7d.csv \
   --pages-28d path/to/gsc-pages-28d.csv \
   --queries-28d path/to/gsc-queries-28d.csv \
+  --base-url https://tokvera.org \
   --out-tracker ops/seo/weekly-gsc-ctr-tracker.csv \
   --out-report ops/seo/weekly-seo-priority-report.md
 ```
+
+The runner now also snapshots:
+
+- `current_title`
+- `current_meta`
+
+directly from the live page HTML before it generates the weekly priority report.
 
 ```bash
 node ops/seo/scripts/import-gsc-export.mjs \
