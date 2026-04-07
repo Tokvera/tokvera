@@ -1,0 +1,79 @@
+{
+  "id": "2026-04-07-technical-seo-crawl-and-index-hardening",
+  "title": "Harden technical SEO crawl and index controls",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the technical SEO hardening batch: generated robots and sitemap routes, removal of no-store from public marketing and docs pages, and explicit noindex controls for auth and dashboard surfaces.",
+  "completed_todo_items": [
+    "Production technical SEO audit",
+    "GSC / sitemap / canonical audit"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/robots.ts",
+          "app/sitemap.ts",
+          "app/auth/layout.tsx",
+          "app/dashboard/layout.tsx",
+          "app/dashboard/dashboard-layout-client.tsx",
+          "next.config.mjs"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-technical-seo-crawl-and-index-hardening.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/robots.ts",
+          "app/sitemap.ts"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/robots.ts",
+          "app/sitemap.ts"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build"
+        ],
+        "notes": "Confirms robots.txt and sitemap.xml are generated in the production build output and that public crawl surfaces remain buildable while auth and dashboard metadata are explicitly noindex."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert robots.ts, sitemap.ts, next.config.mjs cache-control changes, and the auth/dashboard metadata overrides if crawl or cache behavior regresses after deploy."
+  }
+}
