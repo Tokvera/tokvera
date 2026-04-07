@@ -1,0 +1,124 @@
+{
+  "id": "2026-04-07-dashboard-ux-and-public-proof-upgrade-wave",
+  "title": "Complete dashboard UX and public proof upgrade wave",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the full dashboard UX and GEO/AIO proof-upgrade wave. The remaining decision, analysis, workflow, and control pages now teach first-run review order with explicit empty-state guidance, while the remaining high-intent compare and use-case pages now expose short-answer and code-native proof blocks near the top of the page.",
+  "completed_todo_items": [
+    "Improve real user experience in dashboard pages and public-site GEO/AIO quality."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/analytics/page.tsx",
+          "app/dashboard/anomalies/page.tsx",
+          "app/dashboard/budgets/page.tsx",
+          "app/dashboard/error-heatmap/page.tsx",
+          "app/dashboard/model-comparison/page.tsx",
+          "app/dashboard/onboarding/page.tsx",
+          "app/dashboard/reviews/page.tsx",
+          "app/dashboard/savings/page.tsx",
+          "app/dashboard/trace-optimization/page.tsx",
+          "app/dashboard/admin/webhooks/page.tsx",
+          "components/marketing/page-proof-stack.tsx",
+          "app/(marketing)/compare/langfuse-for-coding-agents/page.tsx",
+          "app/(marketing)/compare/langsmith-for-coding-agents/page.tsx",
+          "app/(marketing)/compare/langfuse-for-customer-support-ai/page.tsx",
+          "app/(marketing)/compare/portkey-for-ai-platform-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-compliance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-governance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-product-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-risk-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-security-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-support-ops/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-customer-success-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-architecture-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-procurement-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-sales-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-finance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-partner-engineering-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-revops-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-solutions-engineering-teams/page.tsx",
+          "app/(marketing)/use-cases/ai-agent-handoff-observability/page.tsx",
+          "app/(marketing)/use-cases/coding-agent-observability/page.tsx",
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/multi-agent-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/multi-step-ai-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/rag-tracing/page.tsx",
+          "app/(marketing)/use-cases/ticket-triage-workflow-tracing/page.tsx",
+          "tests/e2e/dashboard-product-paths.spec.ts",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-dashboard-ux-and-public-proof-upgrade-wave.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/dashboard-product-paths.spec.ts --grep \"decision pages explain the review order before operators act|workflow and control pages explain the operating order|super admin webhook page explains replay order before exposing controls\"",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm build"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/page-proof-stack.tsx",
+          "app/dashboard/analytics/page.tsx",
+          "app/dashboard/reviews/page.tsx",
+          "app/dashboard/admin/webhooks/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-for-coding-agents/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-compliance-teams/page.tsx",
+          "app/(marketing)/use-cases/ai-agent-handoff-observability/page.tsx",
+          "app/(marketing)/use-cases/rag-tracing/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "npm run e2e -- tests/e2e/dashboard-product-paths.spec.ts --grep \"decision pages explain the review order before operators act|workflow and control pages explain the operating order|super admin webhook page explains replay order before exposing controls\"",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts",
+          "pnpm build"
+        ],
+        "notes": "Validated the new dashboard guides through route-realistic dashboard shell tests, reran the full public growth smoke, and completed a clean production build after removing stale .next artifacts that were causing intermittent route-resolution failures in this repo."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the dashboard page guidance changes, the shared marketing proof-stack helper, the 29 compare/use-case proof injections, the updated Playwright assertions, and this release-evidence manifest if the UI copy, validation flow, or public proof treatment needs to be reworked."
+  }
+}
