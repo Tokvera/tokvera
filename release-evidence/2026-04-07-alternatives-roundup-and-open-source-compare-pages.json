@@ -1,0 +1,90 @@
+{
+  "id": "2026-04-07-alternatives-roundup-and-open-source-compare-pages",
+  "title": "Ship alternatives roundup and open-source compare pages",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the new exact-intent comparison pages covering best Langfuse alternatives, best LangSmith alternatives, and open source LangSmith alternative, plus compare hub updates and public route smoke coverage.",
+  "completed_todo_items": [
+    "Create the `/compare/` page set for competitor keywords."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/best-langfuse-alternatives/page.tsx",
+          "app/(marketing)/compare/best-langsmith-alternatives/page.tsx",
+          "app/(marketing)/compare/open-source-langsmith-alternative/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-alternatives-roundup-and-open-source-compare-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/best-langfuse-alternatives/page.tsx",
+          "app/(marketing)/compare/best-langsmith-alternatives/page.tsx",
+          "app/(marketing)/compare/open-source-langsmith-alternative/page.tsx",
+          "app/(marketing)/compare/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/best-langfuse-alternatives/page.tsx",
+          "app/(marketing)/compare/best-langsmith-alternatives/page.tsx",
+          "app/(marketing)/compare/open-source-langsmith-alternative/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the new compare intent pages render and remain covered by the public acquisition route smoke suite."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the compare-page expansion is represented in release evidence so announcement and changelog generation remain current."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the three new compare pages, compare hub updates, smoke-test updates, and the release-evidence manifest if the keyword targeting or internal-link strategy needs to change."
+  }
+}
