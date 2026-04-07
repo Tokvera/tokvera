@@ -1,0 +1,83 @@
+{
+  "id": "2026-04-07-dynatrace-compare-and-blog-pages",
+  "title": "Add Dynatrace comparison and supporting blog pages",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the new Dynatrace-focused comparison pages and the supporting blog post so Tokvera can compete against broad enterprise observability positioning with a narrower SaaS AI operations argument for LLM observability and AI gateway workflows.",
+  "completed_todo_items": [
+    "Create the /compare/ page set for competitor keywords."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/dynatrace-for-llm-observability/page.tsx",
+          "app/(marketing)/compare/dynatrace-for-ai-gateway-observability/page.tsx",
+          "app/(marketing)/compare/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "lib/blog-content.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-dynatrace-compare-and-blog-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/compare/dynatrace-for-llm-observability/page.tsx\" --file \"app/(marketing)/compare/dynatrace-for-ai-gateway-observability/page.tsx\" --file \"app/(marketing)/compare/page.tsx\" --file \"components/marketing/marketing-nav.tsx\" --file \"lib/blog-content.tsx\" --file \"tests/e2e/public-growth-surfaces.spec.ts\"",
+          "pnpm exec tsc --noEmit"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/dynatrace-for-llm-observability/page.tsx",
+          "app/(marketing)/compare/dynatrace-for-ai-gateway-observability/page.tsx",
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/dynatrace-for-llm-observability/page.tsx",
+          "app/(marketing)/compare/dynatrace-for-ai-gateway-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "Invoke-WebRequest http://127.0.0.1:3410/compare/dynatrace-for-llm-observability",
+          "Invoke-WebRequest http://127.0.0.1:3410/compare/dynatrace-for-ai-gateway-observability",
+          "Invoke-WebRequest http://127.0.0.1:3410/blog/dynatrace-vs-focused-ai-observability-for-saas-teams",
+          "Invoke-WebRequest http://127.0.0.1:3410/compare"
+        ],
+        "notes": "Verified all new Dynatrace routes returned HTTP 200 and rendered expected headings in a live local dev server. Full marketing build remains blocked by an existing unrelated Next.js /_document page-resolution failure, and the long public Playwright route smoke still loses the local webserver after the first test."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the two Dynatrace comparison pages, the compare hub and nav additions, the supporting blog entry, the route-smoke additions, and this release-evidence manifest if the positioning needs to be reworked or conflicts with the broader compare taxonomy."
+  }
+}
