@@ -169,6 +169,21 @@ node ops/seo/scripts/generate-weekly-seo-priority-report.mjs \
   --out ops/seo/weekly-seo-priority-report.md
 ```
 
+### One-shot command
+
+If you already have both raw exports, run the whole weekly flow in one command:
+
+```bash
+node ops/seo/scripts/run-weekly-seo-review.mjs \
+  --tracker ops/seo/weekly-gsc-ctr-tracker.csv \
+  --pages-7d path/to/gsc-pages-7d.csv \
+  --queries-7d path/to/gsc-queries-7d.csv \
+  --pages-28d path/to/gsc-pages-28d.csv \
+  --queries-28d path/to/gsc-queries-28d.csv \
+  --out-tracker ops/seo/weekly-gsc-ctr-tracker.csv \
+  --out-report ops/seo/weekly-seo-priority-report.md
+```
+
 ```bash
 node ops/seo/scripts/import-gsc-export.mjs \
   --tracker ops/seo/weekly-gsc-ctr-tracker.csv \

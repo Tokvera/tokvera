@@ -1,0 +1,66 @@
+{
+  "id": "2026-04-07-end-to-end-weekly-seo-review-runner",
+  "title": "Add end-to-end weekly SEO review runner",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the one-shot weekly SEO review runner, additional 28-day fixtures, and the end-to-end test that now executes both GSC imports plus priority report generation in one command.",
+  "completed_todo_items": [
+    "Review impressions, CTR, ranking movement, and indexed pages at the end of each week."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/scripts/run-weekly-seo-review.mjs",
+          "ops/seo/weekly-gsc-ctr-review.md",
+          "test/run-weekly-seo-review.test.mjs",
+          "test/fixtures/seo/pages-28d.csv",
+          "test/fixtures/seo/queries-28d.csv",
+          "release-evidence/2026-04-07-end-to-end-weekly-seo-review-runner.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/import-gsc-export.test.mjs",
+          "node test/generate-weekly-seo-priority-report.test.mjs",
+          "node test/run-weekly-seo-review.test.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-review.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/fixtures/seo/pages-28d.csv",
+          "test/fixtures/seo/queries-28d.csv"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/run-weekly-seo-review.test.mjs"
+        ],
+        "notes": "Confirms the weekly runner can update a tracker from 7-day and 28-day exports and produce the markdown priority report in one end-to-end command."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": false,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Delete the weekly runner, 28-day fixtures, test, and playbook references if the SEO review process is reworked into a different ingestion and reporting flow."
+  }
+}
