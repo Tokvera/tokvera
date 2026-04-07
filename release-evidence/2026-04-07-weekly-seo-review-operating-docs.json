@@ -1,0 +1,59 @@
+{
+  "id": "2026-04-07-weekly-seo-review-operating-docs",
+  "title": "Add weekly SEO review operating docs",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the tracked weekly Google Search Console and CTR review playbook plus the first tracker template so Tokvera can move from page production into disciplined weekly search-performance review and refresh work.",
+  "completed_todo_items": [
+    "Review impressions, CTR, ranking movement, and indexed pages at the end of each week."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-review.md",
+          "ops/seo/weekly-gsc-ctr-tracker.csv",
+          "release-evidence/2026-04-07-weekly-seo-review-operating-docs.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-review.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-tracker.csv"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ],
+        "notes": "Confirms the new SEO operating docs are tracked under release evidence and can be referenced in future refresh batches."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": false,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Delete the SEO operating docs and the release-evidence manifest if the review workflow needs to be redesigned or moved to a different planning surface."
+  }
+}
