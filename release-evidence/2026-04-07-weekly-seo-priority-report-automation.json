@@ -1,0 +1,63 @@
+{
+  "id": "2026-04-07-weekly-seo-priority-report-automation",
+  "title": "Add weekly SEO priority report automation",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the weekly SEO priority report generator, the populated tracker fixture, and the playbook update that turns imported Search Console data into a ranked refresh queue across immediate refresh, promotion, intent correction, and no-data buckets.",
+  "completed_todo_items": [
+    "Refresh underperforming pages with stronger titles, FAQs, comparison tables, and clearer search intent alignment."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/scripts/generate-weekly-seo-priority-report.mjs",
+          "ops/seo/weekly-gsc-ctr-review.md",
+          "test/generate-weekly-seo-priority-report.test.mjs",
+          "test/fixtures/seo/tracker-populated.csv",
+          "release-evidence/2026-04-07-weekly-seo-priority-report-automation.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/import-gsc-export.test.mjs",
+          "node test/generate-weekly-seo-priority-report.test.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-review.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/fixtures/seo/tracker-populated.csv"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/generate-weekly-seo-priority-report.test.mjs"
+        ],
+        "notes": "Confirms the weekly report generator classifies tracker rows into the expected refresh buckets and emits a ranked markdown report." 
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": false,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Delete the priority report generator, fixture, test, and playbook references if the SEO review flow is replaced with a different reporting model."
+  }
+}

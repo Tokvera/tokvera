@@ -143,9 +143,10 @@ Every week:
 
 1. export GSC page + query data
 2. import the raw exports into `ops/seo/weekly-gsc-ctr-tracker.csv`
-3. pick the top 5 underperforming pages
-4. make one focused refresh batch
-5. record the refresh in release evidence if code changes ship
+3. generate `ops/seo/weekly-seo-priority-report.md`
+4. pick the top 5 underperforming pages
+5. make one focused refresh batch
+6. record the refresh in release evidence if code changes ship
 
 ### Import commands
 
@@ -158,6 +159,14 @@ node ops/seo/scripts/import-gsc-export.mjs \
   --queries path/to/gsc-queries-7d.csv \
   --period 7d \
   --out ops/seo/weekly-gsc-ctr-tracker.csv
+```
+
+Generate the weekly priority report after both imports:
+
+```bash
+node ops/seo/scripts/generate-weekly-seo-priority-report.mjs \
+  --tracker ops/seo/weekly-gsc-ctr-tracker.csv \
+  --out ops/seo/weekly-seo-priority-report.md
 ```
 
 ```bash
