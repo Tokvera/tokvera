@@ -1,0 +1,79 @@
+{
+  "id": "2026-04-07-structured-data-foundation-for-public-seo-pages",
+  "title": "Add structured data foundation for public SEO pages",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the first structured-data pass across the homepage, compare pages, glossary pages, and blog detail pages, using shared JSON-LD helpers so search crawlers can interpret core public content clusters more reliably.",
+  "completed_todo_items": [
+    "Internal-linking baseline"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/structured-data-script.tsx",
+          "app/page.tsx",
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/glossary-page.tsx",
+          "app/(marketing)/blog/[slug]/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-structured-data-foundation-for-public-seo-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/page.tsx",
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/glossary-page.tsx",
+          "app/(marketing)/blog/[slug]/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/structured-data-script.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build"
+        ],
+        "notes": "Confirms the structured-data helper compiles into the public page clusters and the marketing/docs build remains stable after the JSON-LD additions."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the structured-data helper and the homepage, compare, glossary, and blog page injections if crawler parsing or page rendering regress after deploy."
+  }
+}
