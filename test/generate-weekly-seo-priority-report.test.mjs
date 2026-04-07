@@ -22,8 +22,10 @@ execFileSync(
 
 const output = fs.readFileSync(reportOut, "utf8");
 assert.match(output, /## Immediate Refresh/);
-assert.match(output, /`\/use-cases\/rag-observability`[\s\S]*reason: impressions with zero clicks over 28 days/);
-assert.match(output, /`\/compare\/langfuse-alternative`[\s\S]*reason: high 7-day impressions with weak CTR/);
+assert.match(output, /`\/use-cases\/rag-observability`[\s\S]*reason: top query is weakly reflected in the current title/);
+assert.match(output, /`\/compare\/langfuse-alternative`[\s\S]*reason: top query is weakly reflected in the current title/);
+assert.match(output, /`\/compare\/langfuse-alternative`[\s\S]*title alignment: weak/);
+assert.match(output, /`\/compare\/tokvera-vs-langsmith`[\s\S]*title alignment: strong/);
 assert.match(output, /## Promotion Queue[\s\S]*`\/compare\/tokvera-vs-langsmith`/);
 assert.match(output, /## Intent Correction[\s\S]*`\/compare\/langsmith-alternative`/);
 assert.match(output, /## Need Data[\s\S]*`\/integrations\/python-ai-workflow-tracing`/);

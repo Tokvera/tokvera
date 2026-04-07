@@ -1,0 +1,64 @@
+{
+  "id": "2026-04-07-query-title-alignment-in-weekly-seo-report",
+  "title": "Add query-to-title alignment scoring to weekly SEO review",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the weekly SEO priority report update that now scores how well a page's current title and meta description reflect its top query before classifying refresh priority.",
+  "completed_todo_items": [
+    "Refresh underperforming pages with stronger titles, FAQs, comparison tables, and clearer search intent alignment."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/scripts/generate-weekly-seo-priority-report.mjs",
+          "test/fixtures/seo/tracker-populated.csv",
+          "test/generate-weekly-seo-priority-report.test.mjs",
+          "release-evidence/2026-04-07-query-title-alignment-in-weekly-seo-report.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/import-gsc-export.test.mjs",
+          "node test/snapshot-page-metadata.test.mjs",
+          "node test/generate-weekly-seo-priority-report.test.mjs",
+          "node test/run-weekly-seo-review.test.mjs",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "ops/seo/weekly-gsc-ctr-review.md"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera",
+        "paths": [
+          "test/fixtures/seo/tracker-populated.csv"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/generate-weekly-seo-priority-report.test.mjs"
+        ],
+        "notes": "Confirms the weekly SEO report now escalates high-impression pages when the dominant query is weakly reflected in the current title."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": false,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Remove the query-to-title alignment scoring and revert the updated tracker fixture and report test if the weekly SEO report should return to metric-only prioritization."
+  }
+}

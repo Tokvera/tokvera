@@ -80,6 +80,43 @@ function priorityWeight(priority) {
   return 0;
 }
 
+const STOPWORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "for",
+  "from",
+  "how",
+  "in",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "vs",
+  "with",
+]);
+
+function tokenize(text) {
+  return String(text || "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/g)
+    .filter((token) => token.length >= 3 && !STOPWORDS.has(token));
+}
+
+function scoreAlignment(query, text) {
+  const queryTokens = [...new Set(tokenize(query))];
+  const textTokens = new Set(tokenize(text));
+  if (queryTokens.length === 0 || textTokens.size === 0) {
+    return { label: "unknown", ratio: 0, matched: [] };
+  }
+  const matched = queryTokens.filter((token) => textTokens.has(token));
+  const ratio = matched.length / queryTokens.length;
+  if (ratio >= 0.75) return { label: "strong", ratio, matched };
+  if (ratio >= 0.4) return { label: "partial", ratio, matched };
+  return { label: "weak", ratio, matched };
+}
+
 function classify(row) {
   const i7 = num(row.last_7d_impressions);
   const ctr7 = num(row.last_7d_ctr);
@@ -89,23 +126,37 @@ function classify(row) {
   const ctr28 = num(row.last_28d_ctr);
   const pos28 = num(row.last_28d_position);
   const base = priorityWeight(row.priority);
+  const topQuery = row.top_query_1 || row.target_keyword || "";
+  const titleAlignment = scoreAlignment(topQuery, row.current_title);
+  const metaAlignment = scoreAlignment(topQuery, row.current_meta);
+
+  if (i28 > 100 && titleAlignment.label === "weak") {
+    return {
+      section: "Immediate Refresh",
+      score: 115 + base + i28 / 20,
+      reason: "top query is weakly reflected in the current title",
+      action: "rewrite title/meta",
+      titleAlignment,
+      metaAlignment,
+    };
+  }
 
   if (i28 > 0 && c28 === 0) {
-    return { section: "Immediate Refresh", score: 120 + base + i28 / 10, reason: "impressions with zero clicks over 28 days", action: "rewrite title/meta" };
+    return { section: "Immediate Refresh", score: 120 + base + i28 / 10, reason: "impressions with zero clicks over 28 days", action: "rewrite title/meta", titleAlignment, metaAlignment };
   }
   if (i7 > 100 && ctr7 > 0 && ctr7 < 2.5) {
-    return { section: "Immediate Refresh", score: 110 + base + i7 / 10, reason: "high 7-day impressions with weak CTR", action: "rewrite title/meta" };
+    return { section: "Immediate Refresh", score: 110 + base + i7 / 10, reason: "high 7-day impressions with weak CTR", action: "rewrite title/meta", titleAlignment, metaAlignment };
   }
   if (i28 > 300 && ctr28 > 0 && ctr28 < 3.5) {
-    return { section: "Immediate Refresh", score: 105 + base + i28 / 20, reason: "high 28-day impressions with weak CTR", action: "rewrite title/meta" };
+    return { section: "Immediate Refresh", score: 105 + base + i28 / 20, reason: "high 28-day impressions with weak CTR", action: "rewrite title/meta", titleAlignment, metaAlignment };
   }
   if ((pos7 >= 8 && pos7 <= 20) || (pos28 >= 8 && pos28 <= 20)) {
-    return { section: "Promotion Queue", score: 80 + base, reason: "ranking in positions 8-20", action: row.recommended_action || "add internal links" };
+    return { section: "Promotion Queue", score: 80 + base, reason: "ranking in positions 8-20", action: row.recommended_action || "add internal links", titleAlignment, metaAlignment };
   }
   if ((pos7 > 20) || (pos28 > 20)) {
-    return { section: "Intent Correction", score: 60 + base, reason: "ranking below position 20", action: "inspect SERP intent and narrow the page framing" };
+    return { section: "Intent Correction", score: 60 + base, reason: "ranking below position 20", action: "inspect SERP intent and narrow the page framing", titleAlignment, metaAlignment };
   }
-  return { section: "Need Data", score: base, reason: "tracker has no meaningful search data yet", action: row.recommended_action || "review" };
+  return { section: "Need Data", score: base, reason: "tracker has no meaningful search data yet", action: row.recommended_action || "review", titleAlignment, metaAlignment };
 }
 
 function formatMetric(value, suffix = "") {
@@ -151,7 +202,20 @@ function main() {
     if (group.length === 0) continue;
     lines.push(`## ${section}`, "");
     for (const row of group) {
-      lines.push(`- \`${row.page}\``, `  - keyword: ${row.target_keyword}`, `  - reason: ${row.reason}`, `  - action: ${row.action}`, `  - 7d: ${row.last7}`, `  - 28d: ${row.last28}`, `  - top queries: ${row.topQueries}`, "");
+      lines.push(
+        `- \`${row.page}\``,
+        `  - keyword: ${row.target_keyword}`,
+        `  - reason: ${row.reason}`,
+        `  - action: ${row.action}`,
+        `  - 7d: ${row.last7}`,
+        `  - 28d: ${row.last28}`,
+        `  - top queries: ${row.topQueries}`,
+        `  - title alignment: ${row.titleAlignment.label}`,
+        `  - meta alignment: ${row.metaAlignment.label}`,
+        row.current_title ? `  - current title: ${row.current_title}` : "  - current title: -",
+        row.current_meta ? `  - current meta: ${row.current_meta}` : "  - current meta: -",
+        "",
+      );
     }
   }
 

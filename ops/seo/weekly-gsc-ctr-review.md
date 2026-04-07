@@ -192,6 +192,8 @@ The runner now also snapshots:
 
 directly from the live page HTML before it generates the weekly priority report.
 
+The priority report now also checks whether the top query is strongly, partially, or weakly reflected in the current title and meta description. High-impression pages with weak title alignment should move straight into `Immediate Refresh`, even if the CTR threshold has not degraded far enough yet.
+
 ```bash
 node ops/seo/scripts/import-gsc-export.mjs \
   --tracker ops/seo/weekly-gsc-ctr-tracker.csv \
