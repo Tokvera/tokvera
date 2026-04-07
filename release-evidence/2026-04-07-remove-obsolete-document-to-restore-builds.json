@@ -1,0 +1,73 @@
+{
+  "id": "2026-04-07-remove-obsolete-document-to-restore-builds",
+  "title": "Remove obsolete document page to restore full builds",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for removing the obsolete Pages Router _document file from the dashboard so Next.js no longer fails production builds with a missing /_document module during mixed app-router generation, restoring full build and public-route smoke validation.",
+  "completed_todo_items": [
+    "Production technical SEO audit"
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "pages/_document.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-remove-obsolete-document-to-restore-builds.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/layout.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/layout.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the full production build and long public marketing route smoke both complete successfully after removing the obsolete Pages Router document file."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Restore pages/_document.tsx if a Pages Router document customization is reintroduced later, but only alongside the necessary Pages Router wiring so Next.js continues emitting the special page during production builds."
+  }
+}
