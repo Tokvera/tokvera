@@ -1,0 +1,87 @@
+{
+  "id": "2026-04-07-proof-panels-for-high-intent-seo-pages",
+  "title": "Add proof panels to high-intent SEO pages",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the new reusable proof snapshot component and its rollout across high-intent compare, integration, and use-case pages so these money pages show concrete workflow evidence, root-trace stages, and operational proof instead of relying on copy alone.",
+  "completed_todo_items": [
+    "Upgrade high-intent pages with proof visuals, evidence panels, and sharper comparison depth."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/proof-snapshot.tsx",
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/integration-intent-page.tsx",
+          "components/marketing/use-case-intent-page.tsx",
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-proof-panels-for-high-intent-seo-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/proof-snapshot.tsx",
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/integration-intent-page.tsx",
+          "components/marketing/use-case-intent-page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the proof panels render across public compare, integration, and use-case routes without regressing the marketing route smoke suite."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the proof snapshot component, the shared marketing shell wiring, the page-level proof content, and the release-evidence manifest if the visual proof treatment needs redesign or causes conversion regressions."
+  }
+}
