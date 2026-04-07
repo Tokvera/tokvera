@@ -142,10 +142,46 @@ For each page, record one of:
 Every week:
 
 1. export GSC page + query data
-2. update `ops/seo/weekly-gsc-ctr-tracker.csv`
+2. import the raw exports into `ops/seo/weekly-gsc-ctr-tracker.csv`
 3. pick the top 5 underperforming pages
 4. make one focused refresh batch
 5. record the refresh in release evidence if code changes ship
+
+### Import commands
+
+Run the importer once for `7d` and once for `28d`:
+
+```bash
+node ops/seo/scripts/import-gsc-export.mjs \
+  --tracker ops/seo/weekly-gsc-ctr-tracker.csv \
+  --pages path/to/gsc-pages-7d.csv \
+  --queries path/to/gsc-queries-7d.csv \
+  --period 7d \
+  --out ops/seo/weekly-gsc-ctr-tracker.csv
+```
+
+```bash
+node ops/seo/scripts/import-gsc-export.mjs \
+  --tracker ops/seo/weekly-gsc-ctr-tracker.csv \
+  --pages path/to/gsc-pages-28d.csv \
+  --queries path/to/gsc-queries-28d.csv \
+  --period 28d \
+  --out ops/seo/weekly-gsc-ctr-tracker.csv
+```
+
+Expected raw CSV columns:
+
+- page export:
+  - `Page`
+  - `Clicks`
+  - `Impressions`
+  - `CTR`
+  - `Position`
+- query export:
+  - `Query`
+  - `Page`
+  - `Clicks`
+  - `Impressions`
 
 ## Fast Triage Thresholds
 
