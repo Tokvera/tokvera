@@ -1,0 +1,85 @@
+{
+  "id": "2026-04-07-refresh-high-intent-seo-copy",
+  "title": "Refresh high-intent SEO titles and hero copy",
+  "date": "2026-04-07",
+  "summary": "Records release evidence for the first CTR-oriented refresh pass on five high-intent compare, integration, and use-case pages, tightening the metadata, H1 copy, and public route smoke expectations so the pages align more directly with exact search intent.",
+  "completed_todo_items": [
+    "Start the weekly CTR and title-refresh loop on the highest-intent money pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx",
+          "tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-07-refresh-high-intent-seo-copy.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec tsc --noEmit",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "Confirms the refreshed titles and headings remain reachable across the public acquisition route smoke suite after a clean rebuild."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the metadata and heading refresh on the five target pages plus the smoke-test expectation updates if live CTR data or ranking response suggests a different intent framing is needed."
+  }
+}
