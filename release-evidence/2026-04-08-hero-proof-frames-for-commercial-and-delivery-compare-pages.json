@@ -1,0 +1,94 @@
+{
+  "id": "2026-04-08-hero-proof-frames-for-commercial-and-delivery-compare-pages",
+  "title": "Add hero proof frames to commercial and delivery compare pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the commercial and delivery generic-dashboard comparison pages with top-of-page hero proof frames. These pages now surface the key production decision signals before the longer narrative sections, improving fast human review and answer-engine extraction quality.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on commercial and delivery comparison pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-customer-success-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-sales-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-finance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-hero-proof-frames-for-commercial-and-delivery-compare-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/compare/generic-ai-dashboards-for-customer-success-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-enterprise-sales-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-finance-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build"
+        ]
+      },
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec next start -p 3401 -H 127.0.0.1",
+          "GET /compare/generic-ai-dashboards-for-customer-success-teams -> 200",
+          "GET /compare/generic-ai-dashboards-for-enterprise-sales-teams -> 200",
+          "GET /compare/generic-ai-dashboards-for-finance-teams -> 200",
+          "GET /compare/generic-ai-dashboards-for-implementation-teams -> 200",
+          "GET /compare/generic-ai-dashboards-for-onboarding-teams -> 200"
+        ],
+        "notes": "The long Playwright public smoke hit the known local webserver lifecycle failure after the first route group, so the changed routes were validated directly against a production server instead."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-finance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-customer-success-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-sales-teams/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-implementation-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-onboarding-teams/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "pnpm exec next start -p 3401 -H 127.0.0.1"
+        ],
+        "notes": "The changed commercial and delivery comparison pages returned HTTP 200 under a production server after a clean build."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the five hero-proof-frame insertions on the customer success, enterprise sales, finance, implementation, and onboarding comparison pages and this release-evidence manifest if the top-of-page decision framing needs to be reworked."
+  }
+}
