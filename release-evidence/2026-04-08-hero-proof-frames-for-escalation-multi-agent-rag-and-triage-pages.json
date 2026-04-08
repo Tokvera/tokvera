@@ -1,0 +1,81 @@
+{
+  "id": "2026-04-08-hero-proof-frames-for-escalation-multi-agent-rag-and-triage-pages",
+  "title": "Add hero proof frames to escalation, multi-agent, RAG, and triage pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the remaining workflow-heavy use-case pages with top-of-page hero proof frames. These pages now surface the key production decision signals before the longer narrative sections, improving fast human review and answer-engine extraction quality.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on escalation, multi-agent, RAG, and triage workflow pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/multi-agent-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/rag-tracing/page.tsx",
+          "app/(marketing)/use-cases/ticket-triage-workflow-tracing/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-hero-proof-frames-for-escalation-multi-agent-rag-and-triage-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx\" --file \"app/(marketing)/use-cases/multi-agent-workflow-observability/page.tsx\" --file \"app/(marketing)/use-cases/rag-tracing/page.tsx\" --file \"app/(marketing)/use-cases/ticket-triage-workflow-tracing/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/rag-tracing/page.tsx",
+          "app/(marketing)/use-cases/ticket-triage-workflow-tracing/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/use-cases/multi-agent-workflow-observability/page.tsx",
+          "app/(marketing)/use-cases/incident-escalation-workflow-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "A clean rebuild after clearing stale artifacts passed. The full public growth smoke remained green, confirming the new hero proof frames did not break route renderability across the marketing surface."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the four hero-proof-frame insertions on the escalation, multi-agent, RAG, and ticket triage pages and this release-evidence manifest if the top-of-page decision framing needs to be reworked."
+  }
+}
