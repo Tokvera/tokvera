@@ -1,0 +1,82 @@
+{
+  "id": "2026-04-08-hero-proof-frames-for-governance-risk-and-reliability-compare-pages",
+  "title": "Add hero proof frames to governance, risk, and reliability compare pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the governance, risk, and reliability generic-dashboard comparison pages with top-of-page hero proof frames. These pages now surface the key production decision signals before the longer narrative sections, improving fast human review and answer-engine extraction quality.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on governance, risk, and reliability comparison pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-compliance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-governance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-risk-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-security-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-hero-proof-frames-for-governance-risk-and-reliability-compare-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/compare/generic-ai-dashboards-for-ai-compliance-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-ai-governance-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-ai-risk-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-ai-security-teams/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-compliance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-governance-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-security-teams/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-risk-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-ai-reliability-teams/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "A clean rebuild after clearing stale artifacts passed. The full public growth smoke remained green, confirming the new hero proof frames did not break route renderability across the marketing surface."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the five hero-proof-frame insertions on the compliance, governance, risk, security, and reliability comparison pages and this release-evidence manifest if the top-of-page decision framing needs to be reworked."
+  }
+}
