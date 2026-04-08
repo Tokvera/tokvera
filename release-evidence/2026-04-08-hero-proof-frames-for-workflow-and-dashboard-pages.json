@@ -1,0 +1,82 @@
+{
+  "id": "2026-04-08-hero-proof-frames-for-workflow-and-dashboard-pages",
+  "title": "Add hero proof frames to workflow and dashboard comparison pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the next wave of legacy workflow and dashboard comparison pages with top-of-page hero proof frames. These pages now surface the key production decision signals before the longer narrative sections, improving fast human review and answer-engine extraction quality.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on workflow and dashboard comparison pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/braintrust/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards/page.tsx",
+          "app/(marketing)/use-cases/llm-routing-visibility/page.tsx",
+          "app/(marketing)/use-cases/coding-agent-observability/page.tsx",
+          "app/(marketing)/use-cases/multi-step-ai-workflow-observability/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-hero-proof-frames-for-workflow-and-dashboard-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/compare/braintrust/page.tsx\" --file \"app/(marketing)/compare/generic-ai-dashboards/page.tsx\" --file \"app/(marketing)/use-cases/llm-routing-visibility/page.tsx\" --file \"app/(marketing)/use-cases/coding-agent-observability/page.tsx\" --file \"app/(marketing)/use-cases/multi-step-ai-workflow-observability/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards/page.tsx",
+          "app/(marketing)/use-cases/coding-agent-observability/page.tsx",
+          "app/(marketing)/use-cases/multi-step-ai-workflow-observability/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/braintrust/page.tsx",
+          "app/(marketing)/use-cases/llm-routing-visibility/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "A clean rebuild after clearing stale artifacts passed. The full public growth smoke remained green, confirming the new hero proof frames did not break route renderability across the marketing surface."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the five hero-proof-frame insertions on the Braintrust, generic dashboards, routing, coding-agent, and multi-step workflow pages and this release-evidence manifest if the top-of-page decision framing needs to be reworked."
+  }
+}
