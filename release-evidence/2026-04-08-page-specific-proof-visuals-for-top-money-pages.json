@@ -1,0 +1,87 @@
+{
+  "id": "2026-04-08-page-specific-proof-visuals-for-top-money-pages",
+  "title": "Add page-specific proof visuals to top money pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the highest-intent compare, integration, and RAG pages from generic proof treatment to page-specific top-of-page evidence frames. The shared marketing shells now support hero-level decision proof, and the top money pages now lead with clearer operator signals before the longer narrative sections.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on top money pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/hero-proof-frame.tsx",
+          "components/marketing/compare-intent-page.tsx",
+          "components/marketing/integration-intent-page.tsx",
+          "components/marketing/use-case-intent-page.tsx",
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-page-specific-proof-visuals-for-top-money-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"components/marketing/hero-proof-frame.tsx\" --file \"components/marketing/compare-intent-page.tsx\" --file \"components/marketing/integration-intent-page.tsx\" --file \"components/marketing/use-case-intent-page.tsx\" --file \"app/(marketing)/compare/langfuse-alternative/page.tsx\" --file \"app/(marketing)/compare/tokvera-vs-langsmith/page.tsx\" --file \"app/(marketing)/integrations/fastapi-ai-tracing/page.tsx\" --file \"app/(marketing)/integrations/python-openai-tracing/page.tsx\" --file \"app/(marketing)/use-cases/rag-observability/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/hero-proof-frame.tsx",
+          "app/(marketing)/compare/langfuse-alternative/page.tsx",
+          "app/(marketing)/integrations/fastapi-ai-tracing/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/tokvera-vs-langsmith/page.tsx",
+          "app/(marketing)/integrations/python-openai-tracing/page.tsx",
+          "app/(marketing)/use-cases/rag-observability/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "A clean rebuild after removing stale .next artifacts restored the full marketing validation path. The new hero proof frame now renders correctly on the top intent compare, integration, and RAG pages without changing slugs or link structure."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the shared hero-proof-frame component, the new heroProof shell support, the top money page proof-frame injections, and this release-evidence manifest if the new top-of-page evidence treatment needs to be redesigned."
+  }
+}
