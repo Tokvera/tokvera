@@ -1,0 +1,82 @@
+{
+  "id": "2026-04-08-hero-proof-frames-for-legacy-high-intent-pages",
+  "title": "Add hero proof frames to legacy high-intent pages",
+  "date": "2026-04-08",
+  "summary": "Records release evidence for upgrading the next wave of legacy high-intent comparison, integration, and use-case pages with top-of-page hero proof frames. These pages already had answer and proof content deeper in the page; this release moves the key decision signals higher so buyers can assess production fit faster.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on high-intent legacy pages."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse/page.tsx",
+          "app/(marketing)/compare/langsmith/page.tsx",
+          "app/(marketing)/integrations/langgraph-tracing/page.tsx",
+          "app/(marketing)/use-cases/agent-workflow-debugging/page.tsx",
+          "app/(marketing)/use-cases/ai-gateway-observability/page.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-08-hero-proof-frames-for-legacy-high-intent-pages.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/(marketing)/compare/langfuse/page.tsx\" --file \"app/(marketing)/compare/langsmith/page.tsx\" --file \"app/(marketing)/integrations/langgraph-tracing/page.tsx\" --file \"app/(marketing)/use-cases/agent-workflow-debugging/page.tsx\" --file \"app/(marketing)/use-cases/ai-gateway-observability/page.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langfuse/page.tsx",
+          "app/(marketing)/integrations/langgraph-tracing/page.tsx",
+          "app/(marketing)/use-cases/ai-gateway-observability/page.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/langsmith/page.tsx",
+          "app/(marketing)/use-cases/agent-workflow-debugging/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build",
+          "npm run e2e -- tests/e2e/public-growth-surfaces.spec.ts"
+        ],
+        "notes": "A clean rebuild after clearing stale artifacts passed. The public growth smoke remained green, confirming the new hero proof frames did not break route renderability across the marketing surface."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the five legacy page hero-proof-frame insertions and this release-evidence manifest if the top-of-page decision framing needs to be redesigned."
+  }
+}
