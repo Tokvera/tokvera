@@ -1,0 +1,79 @@
+{
+  "id": "2026-04-09-action-center-priority-first-ux-rewrite",
+  "title": "Rewrite Action Center into a priority-first triage surface",
+  "date": "2026-04-09",
+  "summary": "Records release evidence for the Action Center rewrite that moves urgent issues ahead of filters, collapses the beginner guide after meaningful use, standardizes triage CTA language, and groups secondary diagnostics behind the primary investigation flow. This batch also upgrades the shared dashboard beginner guide primitive so the Action Center can switch between a full guide and a slim triage banner without changing backend contracts.",
+  "completed_todo_items": [
+    "Redesign Action Center as a priority-first triage surface instead of a stacked reporting page.",
+    "Auto-collapse the beginner guide after first meaningful use and keep advanced controls out of the primary scan lane.",
+    "Standardize Action Center issue actions and compress benign-empty states so urgent work is easier to scan."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/action-center/page.tsx",
+          "components/dashboard-empty-state.tsx",
+          "tests/e2e/dashboard-product-paths.spec.ts"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-09-action-center-priority-first-ux-rewrite.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"app/dashboard/action-center/page.tsx\" --file \"components/dashboard-empty-state.tsx\" --file \"tests/e2e/dashboard-product-paths.spec.ts\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build"
+        ],
+        "notes": "Targeted Playwright assertions for the new Action Center ordering and collapsed guide were added, but the local Playwright harness still hit the known blank-screen webserver issue before page assertions could execute."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/action-center/page.tsx",
+          "components/dashboard-empty-state.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/dashboard/action-center/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build"
+        ],
+        "notes": "A full production build completed successfully with the new priority-first Action Center layout, compact healthy states, and collapsible triage guidance."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the Action Center presentation rewrite and the shared DashboardBeginnerGuide collapsed-mode changes if operators find the new priority rail or collapsed triage banner too aggressive."
+  }
+}
