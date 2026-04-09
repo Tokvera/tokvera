@@ -1,0 +1,75 @@
+{
+  "id": "2026-04-09-daily-ai-operations-review-blog",
+  "title": "Add website blog on how SaaS teams should run a daily AI operations review",
+  "date": "2026-04-09",
+  "summary": "Records release evidence for publishing a supporting website blog that teaches SaaS teams a short daily AI operations review: start with the active issue, inspect traces before changing prompts, routes, or budgets, and leave with one owner and one concrete next move.",
+  "completed_todo_items": [
+    "Publish a public website blog explaining how SaaS teams should run a daily AI operations review.",
+    "Support the Action Center positioning with an operational article that links daily triage, trace review, customer impact, and concrete next actions."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-09-daily-ai-operations-review-blog.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"lib/blog-content.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "dev-server smoke: GET /blog/how-saas-teams-should-run-a-daily-ai-operations-review"
+        ],
+        "notes": "The blog route was verified against a temporary next dev server. A full next build remains blocked locally by the known unrelated Windows/Next prerender module-resolution issue on existing compare and announcement routes."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "GET /blog/how-saas-teams-should-run-a-daily-ai-operations-review on a temporary next dev server"
+        ],
+        "notes": "The route returned successfully and rendered the article title."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the blog-content entry and this release-evidence manifest if the daily operations review positioning or SEO framing needs to be rewritten."
+  }
+}
