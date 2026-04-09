@@ -1,0 +1,82 @@
+{
+  "id": "2026-04-09-hero-proof-frames-and-compare-menu-overflow-polish",
+  "title": "Add hero proof frames to partner and enterprise comparison pages and polish the compare mega menu",
+  "date": "2026-04-09",
+  "summary": "Records release evidence for upgrading the remaining partner, RevOps, solutions engineering, enterprise architecture, and enterprise procurement comparison pages with top-of-page hero proof framing. This batch also hardens the desktop and mobile Compare mega menu so it stays inside the viewport, scrolls cleanly, and uses workflow-specific icons instead of a long undifferentiated list.",
+  "completed_todo_items": [
+    "Improve real user experience in website SEO, GEO, and AIO quality on the remaining comparison pages.",
+    "Fix the Compare mega menu so it no longer overlaps the viewport and better communicates page intent with icons."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-partner-engineering-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-revops-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-solutions-engineering-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-architecture-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-procurement-teams/page.tsx",
+          "components/marketing/marketing-nav.tsx",
+          "app/globals.css"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-09-hero-proof-frames-and-compare-menu-overflow-polish.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"components/marketing/marketing-nav.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "pnpm build"
+        ],
+        "notes": "next lint does not accept CSS files via --file, so the scrollbar styling was validated through the production build instead."
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "components/marketing/marketing-nav.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "app/(marketing)/compare/generic-ai-dashboards-for-partner-engineering-teams/page.tsx",
+          "app/(marketing)/compare/generic-ai-dashboards-for-enterprise-procurement-teams/page.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build"
+        ],
+        "notes": "A clean production build completed successfully with the new viewport-bounded Compare menu and the remaining comparison-page hero proof frames in place."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the five comparison-page hero proof insertions plus the Compare mega menu and scrollbar styling changes if the menu density or decision framing needs to be reworked."
+  }
+}
