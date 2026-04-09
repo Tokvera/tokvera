@@ -1,0 +1,73 @@
+{
+  "id": "2026-04-09-action-center-blog-for-saas-owners",
+  "title": "Add website blog on how Action Center helps SaaS owners control AI cost and reliability",
+  "date": "2026-04-09",
+  "summary": "Records release evidence for publishing a new website blog focused on how Tokvera Action Center helps SaaS owners catch repeated failures, workflow pressure, customer spend anomalies, and budget risk before those issues become margin or retention problems.",
+  "completed_todo_items": [
+    "Publish a public website blog explaining how Action Center helps SaaS owners control AI cost and reliability.",
+    "Keep the LinkedIn version private under the local content workflow instead of putting distribution copy in a public repo."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-09-action-center-blog-for-saas-owners.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"lib/blog-content.tsx\"",
+          "pnpm build"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm build"
+        ],
+        "notes": "The new blog slug was included in the statically generated blog route set during the production build."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the blog-content entry and this release-evidence manifest if the positioning or SEO framing needs to be rewritten."
+  }
+}
