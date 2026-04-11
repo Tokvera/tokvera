@@ -1,0 +1,76 @@
+{
+  "id": "2026-04-11-llm-api-bill-spike-debugging-blog",
+  "title": "Add website blog on debugging LLM API bill spikes",
+  "date": "2026-04-11",
+  "summary": "Records release evidence for publishing a practical debugging article that explains why LLM API bills spike in production and how SaaS teams can trace the issue back to retry loops, prompt bloat, routing drift, duplicate calls, or customer-level usage concentration.",
+  "completed_todo_items": [
+    "Publish a practical website article inspired by the LLM API bill spike topic.",
+    "Include internal links to Action Center, Cost Overview, Trace Detail, Optimization Queue, and related operations articles."
+  ],
+  "evidence": {
+    "code": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "paths": [
+          "release-evidence/2026-04-11-llm-api-bill-spike-debugging-blog.json"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "pnpm lint -- --file \"lib/blog-content.tsx\"",
+          "pnpm exec tsc --noEmit",
+          "GET /blog/why-your-llm-api-bill-spiked-and-how-to-fix-it-fast on a temporary next dev server",
+          "pnpm build"
+        ]
+      },
+      {
+        "repo": "tokvera",
+        "commands": [
+          "node test/sync-dashboard-release-history.mjs",
+          "pnpm release-history:check",
+          "node test/check-release-evidence.mjs --base HEAD --head WORKTREE"
+        ]
+      }
+    ],
+    "docs": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "examples": [
+      {
+        "repo": "tokvera-dashboard",
+        "paths": [
+          "lib/blog-content.tsx"
+        ]
+      }
+    ],
+    "smoke_or_visibility": [
+      {
+        "repo": "tokvera-dashboard",
+        "commands": [
+          "GET /blog/why-your-llm-api-bill-spiked-and-how-to-fix-it-fast on a temporary next dev server",
+          "pnpm build"
+        ],
+        "notes": "The new blog route rendered successfully and the production build generated the updated blog route set."
+      }
+    ]
+  },
+  "ops": {
+    "deployment_env_reviewed": true,
+    "rollback_plan_documented": true,
+    "rollback_plan": "Revert the blog-content entry and this release-evidence manifest if the LLM cost spike debugging positioning or internal-link structure needs to be rewritten."
+  }
+}
